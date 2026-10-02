@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plánování pokoje - Zadání a Návod</title>
+    
+    <!-- Google Fonts for a playful, readable typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Nunito', 'sans-serif'],
+                    },
+                    colors: {
+                        pastel: {
+                            blue: '#DDEEFE',
+                            green: '#E2F6ED',
+                            yellow: '#FEF7D9',
+                            pink: '#FCE7EB',
+                            purple: '#EBE5F7',
+                            orange: '#FBEAD2'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Custom styles for specific elements not fully covered by Tailwind utilities */
+        body {
+            background-color: #f8fafc;
+            background-image: radial-gradient(#e2e8f0 2px, transparent 2px);
+            background-size: 30px 30px;
+        }
+        
+        /* Hide all tab contents by default */
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.4s ease-in-out;
+        }
+
+        /* Show active tab content */
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Hide scrollbar for horizontal menu on mobile */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+<body class="text-slate-700 antialiased font-sans">
+
+    <header class="bg-gradient-to-r from-indigo-400 to-purple-400 text-white py-10 px-4 rounded-b-[3rem] shadow-lg mb-10 mx-auto max-w-7xl">
+        <div class="max-w-4xl mx-auto text-center">
+            <h1 class="text-4xl md:text-5xl font-extrabold mb-4 drop-shadow-md">Vytváření modelu 🏠</h1>
+            <h2 class="text-2xl md:text-3xl font-semibold opacity-90 drop-shadow">Plánování pokoje</h2>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 pb-20">
+        
+        <!-- ZADÁNÍ SEKCE -->
+        <section class="bg-white rounded-[2rem] shadow-xl border-t-8 border-pastel-yellow p-6 md:p-10 mb-16 relative overflow-hidden">
+            <!-- Decorative circle -->
+            <div class="absolute -top-10 -right-10 w-32 h-32 bg-pastel-yellow rounded-full opacity-50 z-0"></div>
+            
+            <div class="relative z-10">
+                <div class="flex items-center gap-4 mb-6">
+                    <span class="text-4xl">📝</span>
+                    <h2 class="text-3xl font-bold text-slate-800">Zadání</h2>
+                </div>
+                
+                <div class="bg-slate-50 rounded-2xl p-6 mb-8 border border-slate-100 shadow-inner text-lg">
+                    <p class="font-semibold mb-2 text-slate-700">Stránka, na které budeme pracovat:</p>
+                    <a href="https://floorplancreator.net/plan/demo" target="_blank" class="inline-flex items-center gap-2 bg-indigo-500 hover:bg-indigo-600 text-white py-3 px-6 rounded-xl font-bold transition-transform hover:scale-105 active:scale-95 shadow-md text-lg">
+                        <span>Otevřít Floor Plan Creator</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
+                    </a>
+                </div>
+
+                <div class="mb-8">
+                    <h3 class="text-xl font-bold mb-4 text-slate-700 border-b-2 border-slate-100 pb-2">Hodnocení a požadavky:</h3>
+                    
+                    <ul class="space-y-3">
+                        <li class="flex items-center justify-between bg-pastel-blue/30 p-4 rounded-xl border border-blue-100">
+                            <span class="font-semibold text-blue-900">Rozměry pokoje: 600 cm x 700 cm</span>
+                            <span class="bg-white px-3 py-1 rounded-lg font-bold text-blue-600 shadow-sm">1b</span>
+                        </li>
+                        <li class="flex items-center justify-between bg-pastel-green/30 p-4 rounded-xl border border-green-100">
+                            <span class="font-semibold text-emerald-900">3 okna</span>
+                            <span class="bg-white px-3 py-1 rounded-lg font-bold text-emerald-600 shadow-sm">3b</span>
+                        </li>
+                        <li class="flex items-center justify-between bg-pastel-pink/30 p-4 rounded-xl border border-pink-100">
+                            <span class="font-semibold text-pink-900">1 dveře</span>
+                            <span class="bg-white px-3 py-1 rounded-lg font-bold text-pink-600 shadow-sm">1b</span>
+                        </li>
+                        <li class="flex flex-col sm:flex-row sm:items-center justify-between bg-pastel-purple/30 p-4 rounded-xl border border-purple-100 gap-2">
+                            <span class="font-semibold text-purple-900">Kancelářské potřeby: <span class="font-normal text-purple-800">1 stůl, 1 PC myš, 1 klávesnice, 1 monitor, 1 kancelářské křeslo</span></span>
+                            <span class="bg-white px-3 py-1 rounded-lg font-bold text-purple-600 shadow-sm self-start sm:self-auto">5b</span>
+                        </li>
+                        <li class="flex items-center justify-between bg-pastel-orange/30 p-4 rounded-xl border border-orange-100">
+                            <span class="font-semibold text-orange-900">1 postel</span>
+                            <span class="bg-white px-3 py-1 rounded-lg font-bold text-orange-600 shadow-sm">1b</span>
+                        </li>
+                        <li class="flex flex-col sm:flex-row sm:items-center justify-between bg-slate-100 p-4 rounded-xl border border-slate-200 gap-2">
+                            <span class="font-semibold text-slate-800">Ostatní: <span class="font-normal text-slate-600">1 skříň, 1 komoda, 1 koberec, 1 lampa</span></span>
+                            <span class="bg-white px-3 py-1 rounded-lg font-bold text-slate-600 shadow-sm self-start sm:self-auto">4b</span>
+                        </li>
+                    </ul>
+                    
+                    <div class="mt-4 flex justify-end">
+                        <div class="bg-slate-800 text-white px-6 py-3 rounded-xl font-bold text-xl shadow-lg transform rotate-2">
+                            CELKEM: <span class="text-amber-300">15b</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-gradient-to-r from-amber-50 to-orange-50 p-6 rounded-2xl border border-amber-200">
+                    <p class="text-amber-900 text-lg font-medium leading-relaxed">
+                        <span class="text-2xl mr-2">✨</span>
+                        <strong>Máš už vše hotové?</strong> Zkus změnit barvičky jednotlivých předmětů! Dále si můžeš přidat jakýkoliv další nábytek nebo výzdobu do svého pokoje. Fantazií se meze nekladou 😊.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- NÁVOD SEKCE -->
+        <section class="mb-10">
+            <div class="flex items-center gap-4 mb-8 pl-4">
+                <span class="text-4xl">📖</span>
+                <h2 class="text-3xl font-bold text-slate-800">Návod pro práci</h2>
+            </div>
+
+            <div class="flex flex-col lg:flex-row gap-8">
+                
+                <!-- Navigační menu -->
+                <nav class="lg:w-1/4">
+                    <div class="bg-white rounded-2xl shadow-lg p-4 sticky top-4">
+                        <h3 class="font-bold text-slate-500 mb-4 px-2 uppercase tracking-wider text-sm">Kroky</h3>
+                        <ul class="flex lg:flex-col gap-2 overflow-x-auto no-scrollbar pb-2 lg:pb-0" id="tutorialTabs">
+                            <li>
+                                <button onclick="openTab('mistnost')" class="tab-btn w-full text-left px-5 py-4 rounded-xl font-bold transition-all whitespace-nowrap bg-indigo-50 text-indigo-700 shadow-sm border-2 border-indigo-200 hover:bg-indigo-100" data-target="mistnost">
+                                    🏠 Místnost
+                                </button>
+                            </li>
+                            <li>
+                                <button onclick="openTab('okno')" class="tab-btn w-full text-left px-5 py-4 rounded-xl font-bold transition-all whitespace-nowrap text-slate-600 hover:bg-slate-50 border-2 border-transparent" data-target="okno">
+                                    🪟 Okno
+                                </button>
+                            </li>
+                            <li>
+                                <button onclick="openTab('dvere')" class="tab-btn w-full text-left px-5 py-4 rounded-xl font-bold transition-all whitespace-nowrap text-slate-600 hover:bg-slate-50 border-2 border-transparent" data-target="dvere">
+                                    🚪 Dveře
+                                </button>
+                            </li>
+                            <li>
+                                <button onclick="openTab('kancelar')" class="tab-btn w-full text-left px-5 py-4 rounded-xl font-bold transition-all whitespace-nowrap text-slate-600 hover:bg-slate-50 border-2 border-transparent" data-target="kancelar">
+                                    📎 Kancelářské potřeby
+                                </button>
+                            </li>
+                            <li>
+                                <button onclick="openTab('postel')" class="tab-btn w-full text-left px-5 py-4 rounded-xl font-bold transition-all whitespace-nowrap text-slate-600 hover:bg-slate-50 border-2 border-transparent" data-target="postel">
+                                    🛏️ Postel
+                                </button>
+                            </li>
+                            <li>
+                                <button onclick="openTab('ostatni')" class="tab-btn w-full text-left px-5 py-4 rounded-xl font-bold transition-all whitespace-nowrap text-slate-600 hover:bg-slate-50 border-2 border-transparent" data-target="ostatni">
+                                    ✨ Ostatní
+                                </button>
+                            </li>
+                            <li>
+                                <button onclick="openTab('barvicky')" class="tab-btn w-full text-left px-5 py-4 rounded-xl font-bold transition-all whitespace-nowrap text-slate-600 hover:bg-slate-50 border-2 border-transparent" data-target="barvicky">
+                                    🎨 Barvičky
+                                </button>
+                            </li>
+                        </ul>
+                    </div>
+                </nav>
+
+                <!-- Obsah návodu -->
+                <div class="lg:w-3/4 bg-white rounded-[2rem] shadow-xl p-6 md:p-10 min-h-[500px] border-t-8 border-indigo-400">
+                    
+                    <!-- 1. MÍSTNOST -->
+                    <div id="mistnost" class="tab-content active">
+                        <h3 class="text-3xl font-bold text-slate-800 mb-6 flex items-center gap-3">
+                            <span class="bg-indigo-100 text-indigo-600 p-2 rounded-lg text-2xl">🏠</span>
+                            Místnost
+                        </h3>
+                        
+                        <div class="mb-8">
+                            <h4 class="text-xl font-bold text-indigo-900 mb-3 bg-indigo-50 py-2 px-4 rounded-lg inline-block">Krok 1: Přidání místnosti</h4>
+                            <p class="text-lg text-slate-700 mb-4">Nejprve vyber tvar místnosti z nabídky na levé straně a přetáhni ho na prázdnou plochu.</p>
+                            
+                            <img src="images/mistnost1.png" alt="Výběr tvaru místnosti" class="rounded-xl shadow-md border border-slate-100 max-w-full h-auto mt-2">
+                        </div>
+
+                        <div class="mb-4">
+                            <h4 class="text-xl font-bold text-indigo-900 mb-3 bg-indigo-50 py-2 px-4 rounded-lg inline-block">Krok 2: Nastavení rozměrů</h4>
+                            <p class="text-lg text-slate-700 mb-4"><strong class="text-red-500">Nejdříve kliknout na místnost!</strong> Pak můžeš nahoře nastavit přesné rozměry.</p>
+                            
+                            <img src="images/mistnost2.png" alt="Nastavení rozměrů pokoje" class="rounded-xl shadow-md border border-slate-100 max-w-full h-auto mt-2">
+                        </div>
+                    </div>
+
+                    <!-- 2. OKNO -->
+                    <div id="okno" class="tab-content">
+                        <h3 class="text-3xl font-bold text-slate-800 mb-6 flex items-center gap-3">
+                            <span class="bg-pastel-blue text-blue-600 p-2 rounded-lg text-2xl">🪟</span>
+                            Okno
+                        </h3>
+                        
+                        <div class="mb-8">
+                            <h4 class="text-xl font-bold text-blue-900 mb-3 bg-blue-50 py-2 px-4 rounded-lg inline-block">Krok 1: Přidání okna</h4>
+                            <p class="text-lg text-slate-700 mb-4">V levém menu najdi kategorii <strong>Doors & windows</strong> a vyber okno. Přetáhni ho na zeď místnosti.</p>
+                            
+                            <img src="images/okno1.png" alt="Výběr okna" class="rounded-xl shadow-md border border-slate-100 max-w-full h-auto mt-2">
+                        </div>
+
+                        <div class="mb-4">
+                            <h4 class="text-xl font-bold text-blue-900 mb-3 bg-blue-50 py-2 px-4 rounded-lg inline-block">Krok 2: Úprava rozměrů okna</h4>
+                            <p class="text-lg text-slate-700 mb-4">Pro úpravu rozměru můžeme použít <strong>šipky na okrajích</strong>, když klikneme na okno.</p>
+                            
+                            <img src="images/okno2.png" alt="Úprava rozměrů okna" class="rounded-xl shadow-md border border-slate-100 max-w-full h-auto mt-2">
+                        </div>
+                    </div>
+
+                    <!-- 3. DVEŘE -->
+                    <div id="dvere" class="tab-content">
+                        <h3 class="text-3xl font-bold text-slate-800 mb-6 flex items-center gap-3">
+                            <span class="bg-amber-100 text-amber-700 p-2 rounded-lg text-2xl">🚪</span>
+                            Dveře
+                        </h3>
+                        
+                        <div class="mb-8">
+                            <h4 class="text-xl font-bold text-amber-900 mb-3 bg-amber-50 py-2 px-4 rounded-lg inline-block">Krok 1: Přidání dveří</h4>
+                            <p class="text-lg text-slate-700 mb-4">Podobně jako okno, v sekci <strong>Doors & windows</strong> vyber dveře a umísti je na zeď.</p>
+                            
+                            <img src="images/dvere1.png" alt="Výběr dveří" class="rounded-xl shadow-md border border-slate-100 max-w-full h-auto mt-2">
+                        </div>
+
+                        <div class="mb-4">
+                            <h4 class="text-xl font-bold text-amber-900 mb-3 bg-amber-50 py-2 px-4 rounded-lg inline-block">Krok 2: Úprava rozměrů a otevírání</h4>
+                            <p class="text-lg text-slate-700 mb-4">Pro úpravu rozměrů můžeme použít šipky na okrajích, když klikneme na dveře. Šipkou u dveří můžeme také upravit <strong>směr otevíraní</strong> a jestli se budou otevírat <strong>dovnitř nebo ven</strong>.</p>
+                            
+                            <img src="images/dvere2.png" alt="Úprava dveří" class="rounded-xl shadow-md border border-slate-100 max-w-full h-auto mt-2">
+                        </div>
+                    </div>
+
+                    <!-- 4. KANCELÁŘ -->
+                    <div id="kancelar" class="tab-content">
+                        <h3 class="text-3xl font-bold text-slate-800 mb-6 flex items-center gap-3">
+                            <span class="bg-gray-200 text-gray-700 p-2 rounded-lg text-2xl">📎</span>
+                            Kancelářské potřeby
+                        </h3>
+                        
+                        <div class="mb-4">
+                            <h4 class="text-xl font-bold text-gray-800 mb-3 bg-gray-100 py-2 px-4 rounded-lg inline-block">Přidání kancelářských potřeb</h4>
+                            <p class="text-lg text-slate-700 mb-4">V levém menu najdi záložku <strong>Office</strong> (Kancelář). Zde najdeš stůl (Desk), židli (Chair), monitor, klávesnici i myš!</p>
+                            
+                            <img src="images/potreby1.png" alt="Kancelářské potřeby" class="rounded-xl shadow-md border border-slate-100 max-w-full h-auto mt-2">
+                        </div>
+                    </div>
+
+                    <!-- 5. POSTEL -->
+                    <div id="postel" class="tab-content">
+                        <h3 class="text-3xl font-bold text-slate-800 mb-6 flex items-center gap-3">
+                            <span class="bg-rose-100 text-rose-600 p-2 rounded-lg text-2xl">🛏️</span>
+                            Postel
+                        </h3>
+                        
+                        <div class="mb-4">
+                            <h4 class="text-xl font-bold text-rose-900 mb-3 bg-rose-50 py-2 px-4 rounded-lg inline-block">Přidání postele</h4>
+                            <p class="text-lg text-slate-700 mb-4">Kde budeme spát? Najdi v levém menu záložku <strong>Bedroom</strong> (Ložnice) a vyber si postel, která se ti líbí.</p>
+                            
+                            <img src="images/postel.png" alt="Výběr postele" class="rounded-xl shadow-md border border-slate-100 max-w-full h-auto mt-2">
+                        </div>
+                    </div>
+
+                    <!-- 6. OSTATNÍ -->
+                    <div id="ostatni" class="tab-content">
+                        <h3 class="text-3xl font-bold text-slate-800 mb-6 flex items-center gap-3">
+                            <span class="bg-teal-100 text-teal-700 p-2 rounded-lg text-2xl">✨</span>
+                            Ostatní
+                        </h3>
+                        
+                        <div class="mb-4">
+                            <h4 class="text-xl font-bold text-teal-900 mb-3 bg-teal-50 py-2 px-4 rounded-lg inline-block">Přidání ostatních věcí</h4>
+                            <p class="text-lg text-slate-700 mb-4">Skříně, komody, koberce a různé doplňky najdeš většinou v záložce <strong>General</strong> (Obecné) nebo v dalších speciálních kategoriích. Prozkoumej je!</p>
+                            
+                            <div class="flex flex-col sm:flex-row gap-4 mt-2">
+                                <img src="images/ostatni1.png" alt="Ostatní předměty 1" class="rounded-xl shadow-md border border-slate-100 max-w-full h-auto">
+                                <img src="images/ostatni2.png" alt="Ostatní předměty 2" class="rounded-xl shadow-md border border-slate-100 max-w-full h-auto object-contain">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 7. BARVIČKY -->
+                    <div id="barvicky" class="tab-content">
+                        <h3 class="text-3xl font-bold text-slate-800 mb-6 flex items-center gap-3">
+                            <span class="bg-fuchsia-100 text-fuchsia-600 p-2 rounded-lg text-2xl">🎨</span>
+                            Barvičky
+                        </h3>
+                        
+                        <div class="mb-8">
+                            <h4 class="text-xl font-bold text-fuchsia-900 mb-3 bg-fuchsia-50 py-2 px-4 rounded-lg inline-block">Jak na změnu barvy</h4>
+                            <p class="text-lg text-slate-700 mb-4">Barvu změníme tak, že klikneme na libovolný předmět, u kterého chceme barvu změnit. Na levé liště se objeví tlačítko <strong>„Color“</strong> (ikona palety).</p>
+                            
+                            <img src="images/barvicky1.png" alt="Tlačítko Color" class="rounded-xl shadow-md border border-slate-100 max-w-full h-auto mt-2">
+                        </div>
+
+                        <div class="mb-4 bg-orange-50 border-l-4 border-orange-400 p-6 rounded-r-2xl">
+                            <h4 class="text-xl font-bold text-orange-800 mb-2">⚠️ Pozor!</h4>
+                            <p class="text-lg text-slate-700 mb-6">Některé předměty mohou mít <strong>více částí</strong>, u kterých je možné barvu změnit (například u stolu vrchní desku a nohy zvlášť).</p>
+                            
+                            <div class="mt-4">
+                                <img src="images/barvicky2.png" alt="Výběr části k obarvení" class="rounded-xl shadow-md border border-slate-100 max-w-full h-auto">
+                            </div>
+                        </div>
+                    </div>
+                    
+                </div>
+            </div>
+        </section>
+        
+    </main>
+
+    <footer class="bg-slate-800 text-slate-400 text-center py-8 mt-12 border-t-4 border-indigo-500">
+        <p class="text-lg">Hodně štěstí při plánování tvého pokoje! 🚀</p>
+    </footer>
+
+    <script>
+        // Funkce pro přepínání záložek
+        function openTab(tabName) {
+            // Skrýt všechny obsahy záložek
+            const tabContents = document.querySelectorAll('.tab-content');
+            tabContents.forEach(content => {
+                content.classList.remove('active');
+            });
+
+            // Resetovat styly všech tlačítek
+            const tabBtns = document.querySelectorAll('.tab-btn');
+            tabBtns.forEach(btn => {
+                btn.className = "tab-btn w-full text-left px-5 py-4 rounded-xl font-bold transition-all whitespace-nowrap text-slate-600 hover:bg-slate-50 border-2 border-transparent";
+            });
+
+            // Zobrazit požadovaný obsah
+            const activeTab = document.getElementById(tabName);
+            if (activeTab) {
+                activeTab.classList.add('active');
+            }
+
+            // Zvýraznit aktivní tlačítko
+            const activeBtn = document.querySelector(`button[data-target="${tabName}"]`);
+            if (activeBtn) {
+                // Přidáme speciální třídy pro aktivní stav (např. fialové pozadí)
+                activeBtn.className = "tab-btn w-full text-left px-5 py-4 rounded-xl font-bold transition-all whitespace-nowrap bg-indigo-50 text-indigo-700 shadow-sm border-2 border-indigo-200";
+            }
+        }
+    </script>
+</body>
+</html>
