@@ -68,6 +68,26 @@
         .zadani-item .label-text { transition: opacity .25s; text-decoration-thickness: 2px; }
         .zadani-item.done .label-text { text-decoration-line: line-through; opacity: .55; }
         .zadani-item.done .pts { background: #d1fae5; }
+        #toast {
+            bottom: calc(1.5rem + env(safe-area-inset-bottom, 0px));
+            max-width: min(90vw, 28rem);
+            opacity: 0;
+            transform: translate(-50%, 160%);
+            transition: transform .5s cubic-bezier(.22, 1, .36, 1), opacity .35s ease;
+        }
+        #toast { white-space: pre-line; }
+        .check-btn[data-locked="true"] { position: relative; opacity: .6; cursor: not-allowed; background: #f1f5f9; }
+        .check-btn[data-locked="true"]:hover { transform: none; border-color: #cbd5e1; }
+        .check-btn[data-locked="true"]::after { content: "🔒"; position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: .9rem; }
+        #toast.show { opacity: 1; transform: translate(-50%, 0); }
+        @media (max-width: 767px) {
+            #toast { bottom: calc(5.5rem + env(safe-area-inset-bottom, 0px)); } /* nad tlačítkem "Zpět na zadání" */
+        }
+        @media (prefers-reduced-motion: reduce) {
+            #toast { transition: opacity .2s ease; transform: translate(-50%, 0); }
+        }
+        @keyframes tabCheckPop { 0% { transform: scale(0); } 70% { transform: scale(1.3); } 100% { transform: scale(1); } }
+        .tab-check { animation: tabCheckPop .35s ease-out; }
         @keyframes scoreBump { 0% { transform: scale(1); } 40% { transform: scale(1.35); } 100% { transform: scale(1); } }
         .score-bump { animation: scoreBump .4s ease-out; }
 
@@ -109,9 +129,6 @@
         
         <!-- ZADÁNÍ SEKCE -->
         <section id="zadani" class="bg-white rounded-[2rem] shadow-xl border-t-8 border-pastel-yellow p-6 md:p-10 mb-16 relative overflow-hidden">
-            <!-- Decorative circle -->
-            <div class="absolute -top-10 -right-10 w-32 h-32 bg-pastel-yellow rounded-full opacity-50 z-0"></div>
-            
             <div class="relative z-10">
                 <div class="flex items-center gap-4 mb-6">
                     <span class="text-4xl">📝</span>
@@ -132,28 +149,32 @@
                     
                     <ul class="space-y-3">
                         <li role="button" tabindex="0" onclick="goToStep('mistnost')" onkeydown="if(event.target!==this)return;if(event.key==='Enter'||event.key===' '){event.preventDefault();goToStep('mistnost')}" class="zadani-item flex items-center justify-between bg-pastel-blue/30 p-5 rounded-xl border border-blue-100 cursor-pointer transition hover:shadow-md hover:-translate-y-0.5 focus:outline-none focus-visible:ring-4 focus-visible:ring-indigo-300">
-                            <span class="flex items-start gap-4"><button type="button" role="checkbox" aria-checked="false" aria-label="Označit jako splněné" data-pts="1" class="check-btn shrink-0 mt-0.5 h-8 w-8 rounded-lg border-2 border-slate-300 bg-white flex items-center justify-center focus:outline-none focus-visible:ring-4 focus-visible:ring-emerald-300"><svg class="check-svg h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="4"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg></button><span class="label-text font-semibold text-lg md:text-xl text-blue-900">📐 Rozměry pokoje: 600 cm x 700 cm</span></span>
+                            <span class="flex items-start gap-4"><button type="button" role="checkbox" data-tab="mistnost" aria-checked="false" aria-label="Označit jako splněné" data-pts="1" class="check-btn shrink-0 mt-0.5 h-8 w-8 rounded-lg border-2 border-slate-300 bg-white flex items-center justify-center focus:outline-none focus-visible:ring-4 focus-visible:ring-emerald-300"><svg class="check-svg h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="4"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg></button><span class="label-text font-semibold text-lg md:text-xl text-blue-900">📐 Rozměry pokoje: 600 cm x 700 cm</span></span>
                             <span class="pts bg-white px-4 py-1.5 text-lg md:text-xl rounded-lg font-bold text-blue-600 shadow-sm">1b</span>
                         </li>
                         <li role="button" tabindex="0" onclick="goToStep('okno')" onkeydown="if(event.target!==this)return;if(event.key==='Enter'||event.key===' '){event.preventDefault();goToStep('okno')}" class="zadani-item flex items-center justify-between bg-pastel-green/30 p-5 rounded-xl border border-green-100 cursor-pointer transition hover:shadow-md hover:-translate-y-0.5 focus:outline-none focus-visible:ring-4 focus-visible:ring-indigo-300">
-                            <span class="flex items-start gap-4"><button type="button" role="checkbox" aria-checked="false" aria-label="Označit jako splněné" data-pts="3" class="check-btn shrink-0 mt-0.5 h-8 w-8 rounded-lg border-2 border-slate-300 bg-white flex items-center justify-center focus:outline-none focus-visible:ring-4 focus-visible:ring-emerald-300"><svg class="check-svg h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="4"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg></button><span class="label-text font-semibold text-lg md:text-xl text-emerald-900">🪟 3x okno</span></span>
+                            <span class="flex items-start gap-4"><button type="button" role="checkbox" data-tab="okno" aria-checked="false" aria-label="Označit jako splněné" data-pts="3" class="check-btn shrink-0 mt-0.5 h-8 w-8 rounded-lg border-2 border-slate-300 bg-white flex items-center justify-center focus:outline-none focus-visible:ring-4 focus-visible:ring-emerald-300"><svg class="check-svg h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="4"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg></button><span class="label-text font-semibold text-lg md:text-xl text-emerald-900">🪟 3x okno</span></span>
                             <span class="pts bg-white px-4 py-1.5 text-lg md:text-xl rounded-lg font-bold text-emerald-600 shadow-sm">3b</span>
                         </li>
                         <li role="button" tabindex="0" onclick="goToStep('dvere')" onkeydown="if(event.target!==this)return;if(event.key==='Enter'||event.key===' '){event.preventDefault();goToStep('dvere')}" class="zadani-item flex items-center justify-between bg-pastel-pink/30 p-5 rounded-xl border border-pink-100 cursor-pointer transition hover:shadow-md hover:-translate-y-0.5 focus:outline-none focus-visible:ring-4 focus-visible:ring-indigo-300">
-                            <span class="flex items-start gap-4"><button type="button" role="checkbox" aria-checked="false" aria-label="Označit jako splněné" data-pts="1" class="check-btn shrink-0 mt-0.5 h-8 w-8 rounded-lg border-2 border-slate-300 bg-white flex items-center justify-center focus:outline-none focus-visible:ring-4 focus-visible:ring-emerald-300"><svg class="check-svg h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="4"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg></button><span class="label-text font-semibold text-lg md:text-xl text-pink-900">🚪 1x dveře</span></span>
+                            <span class="flex items-start gap-4"><button type="button" role="checkbox" data-tab="dvere" aria-checked="false" aria-label="Označit jako splněné" data-pts="1" class="check-btn shrink-0 mt-0.5 h-8 w-8 rounded-lg border-2 border-slate-300 bg-white flex items-center justify-center focus:outline-none focus-visible:ring-4 focus-visible:ring-emerald-300"><svg class="check-svg h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="4"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg></button><span class="label-text font-semibold text-lg md:text-xl text-pink-900">🚪 1x dveře</span></span>
                             <span class="pts bg-white px-4 py-1.5 text-lg md:text-xl rounded-lg font-bold text-pink-600 shadow-sm">1b</span>
                         </li>
                         <li role="button" tabindex="0" onclick="goToStep('kancelar')" onkeydown="if(event.target!==this)return;if(event.key==='Enter'||event.key===' '){event.preventDefault();goToStep('kancelar')}" class="zadani-item flex flex-col sm:flex-row sm:items-center justify-between bg-pastel-purple/30 p-5 rounded-xl border border-purple-100 gap-2 cursor-pointer transition hover:shadow-md hover:-translate-y-0.5 focus:outline-none focus-visible:ring-4 focus-visible:ring-indigo-300">
-                            <span class="flex items-start gap-4"><button type="button" role="checkbox" aria-checked="false" aria-label="Označit jako splněné" data-pts="5" class="check-btn shrink-0 mt-0.5 h-8 w-8 rounded-lg border-2 border-slate-300 bg-white flex items-center justify-center focus:outline-none focus-visible:ring-4 focus-visible:ring-emerald-300"><svg class="check-svg h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="4"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg></button><span class="label-text font-semibold text-lg md:text-xl text-purple-900">📎 Kancelářské potřeby: <span class="font-normal text-purple-800">1x stůl, 1x PC myš, 1x klávesnice, 1x monitor, 1x kancelářské křeslo</span></span></span>
+                            <span class="flex items-start gap-4"><button type="button" role="checkbox" data-tab="kancelar" aria-checked="false" aria-label="Označit jako splněné" data-pts="5" class="check-btn shrink-0 mt-0.5 h-8 w-8 rounded-lg border-2 border-slate-300 bg-white flex items-center justify-center focus:outline-none focus-visible:ring-4 focus-visible:ring-emerald-300"><svg class="check-svg h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="4"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg></button><span class="label-text font-semibold text-lg md:text-xl text-purple-900">📎 Kancelářské potřeby: <span class="font-normal text-purple-800">1x stůl, 1x PC myš, 1x klávesnice, 1x monitor, 1x kancelářské křeslo</span></span></span>
                             <span class="pts bg-white px-4 py-1.5 text-lg md:text-xl rounded-lg font-bold text-purple-600 shadow-sm self-start sm:self-auto">5b</span>
                         </li>
                         <li role="button" tabindex="0" onclick="goToStep('postel')" onkeydown="if(event.target!==this)return;if(event.key==='Enter'||event.key===' '){event.preventDefault();goToStep('postel')}" class="zadani-item flex items-center justify-between bg-pastel-orange/30 p-5 rounded-xl border border-orange-100 cursor-pointer transition hover:shadow-md hover:-translate-y-0.5 focus:outline-none focus-visible:ring-4 focus-visible:ring-indigo-300">
-                            <span class="flex items-start gap-4"><button type="button" role="checkbox" aria-checked="false" aria-label="Označit jako splněné" data-pts="1" class="check-btn shrink-0 mt-0.5 h-8 w-8 rounded-lg border-2 border-slate-300 bg-white flex items-center justify-center focus:outline-none focus-visible:ring-4 focus-visible:ring-emerald-300"><svg class="check-svg h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="4"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg></button><span class="label-text font-semibold text-lg md:text-xl text-orange-900">🛏️ 1x postel</span></span>
+                            <span class="flex items-start gap-4"><button type="button" role="checkbox" data-tab="postel" aria-checked="false" aria-label="Označit jako splněné" data-pts="1" class="check-btn shrink-0 mt-0.5 h-8 w-8 rounded-lg border-2 border-slate-300 bg-white flex items-center justify-center focus:outline-none focus-visible:ring-4 focus-visible:ring-emerald-300"><svg class="check-svg h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="4"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg></button><span class="label-text font-semibold text-lg md:text-xl text-orange-900">🛏️ 1x postel</span></span>
                             <span class="pts bg-white px-4 py-1.5 text-lg md:text-xl rounded-lg font-bold text-orange-600 shadow-sm">1b</span>
                         </li>
                         <li role="button" tabindex="0" onclick="goToStep('ostatni')" onkeydown="if(event.target!==this)return;if(event.key==='Enter'||event.key===' '){event.preventDefault();goToStep('ostatni')}" class="zadani-item flex flex-col sm:flex-row sm:items-center justify-between bg-slate-100 p-5 rounded-xl border border-slate-200 gap-2 cursor-pointer transition hover:shadow-md hover:-translate-y-0.5 focus:outline-none focus-visible:ring-4 focus-visible:ring-indigo-300">
-                            <span class="flex items-start gap-4"><button type="button" role="checkbox" aria-checked="false" aria-label="Označit jako splněné" data-pts="4" class="check-btn shrink-0 mt-0.5 h-8 w-8 rounded-lg border-2 border-slate-300 bg-white flex items-center justify-center focus:outline-none focus-visible:ring-4 focus-visible:ring-emerald-300"><svg class="check-svg h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="4"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg></button><span class="label-text font-semibold text-lg md:text-xl text-slate-800">✨ Ostatní: <span class="font-normal text-slate-600">1x skříň, 1x komoda, 1x koberec, 1x lampa</span></span></span>
+                            <span class="flex items-start gap-4"><button type="button" role="checkbox" data-tab="ostatni" aria-checked="false" aria-label="Označit jako splněné" data-pts="4" class="check-btn shrink-0 mt-0.5 h-8 w-8 rounded-lg border-2 border-slate-300 bg-white flex items-center justify-center focus:outline-none focus-visible:ring-4 focus-visible:ring-emerald-300"><svg class="check-svg h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="4"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg></button><span class="label-text font-semibold text-lg md:text-xl text-slate-800">✨ Ostatní: <span class="font-normal text-slate-600">1x skříň, 1x komoda, 1x koberec, 1x lampa</span></span></span>
                             <span class="pts bg-white px-4 py-1.5 text-lg md:text-xl rounded-lg font-bold text-slate-600 shadow-sm self-start sm:self-auto">4b</span>
+                        </li>
+                        <li role="button" tabindex="0" onclick="goToStep('odevzdani')" onkeydown="if(event.target!==this)return;if(event.key==='Enter'||event.key===' '){event.preventDefault();goToStep('odevzdani')}" class="zadani-item flex items-center justify-between bg-emerald-50 p-5 rounded-xl border border-emerald-200 gap-2 cursor-pointer transition hover:shadow-md hover:-translate-y-0.5 focus:outline-none focus-visible:ring-4 focus-visible:ring-indigo-300">
+                            <span class="flex items-start gap-4"><button type="button" role="checkbox" data-tab="odevzdani" aria-checked="false" aria-label="Označit jako splněné" data-pts="0" class="check-btn shrink-0 mt-0.5 h-8 w-8 rounded-lg border-2 border-slate-300 bg-white flex items-center justify-center focus:outline-none focus-visible:ring-4 focus-visible:ring-emerald-300"><svg class="check-svg h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="4"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg></button><span class="label-text font-semibold text-lg md:text-xl text-emerald-900">📤 Odevzdání: <span class="font-normal text-emerald-800">snímek 2D a 3D pohledu do MS Teams</span></span></span>
+                            <span class="pts bg-white px-4 py-1.5 text-base md:text-lg rounded-lg font-bold text-emerald-600 shadow-sm whitespace-nowrap">bez bodů</span>
                         </li>
                     </ul>
                     
@@ -166,7 +187,6 @@
                             <div class="mt-2 h-3 rounded-full bg-white overflow-hidden">
                                 <div id="scoreBar" class="h-full rounded-full bg-emerald-500" style="width:0%; transition: width 0.5s ease;"></div>
                             </div>
-                            <p id="scoreMsg" class="hidden mt-2 text-emerald-800 font-semibold">🎉 Všechno splněno, skvělá práce!</p>
                         </div>
                         <div class="bg-slate-800 text-white px-6 py-3 rounded-xl font-bold text-xl shadow-lg transform rotate-2 transition-transform duration-300 ease-out hover:rotate-0 hover:scale-110 active:rotate-0 active:scale-110 cursor-default">
                             CELKEM: <span class="text-amber-300">15b</span>
@@ -481,6 +501,9 @@
         
     </main>
 
+    <!-- Malé vyskakovací okénko s hláškou -->
+    <div id="toast" role="status" aria-live="polite" class="fixed left-1/2 z-[95] bg-slate-800 text-white font-bold text-lg px-6 py-3 rounded-2xl shadow-2xl text-center pointer-events-none"></div>
+
     <canvas id="confetti" class="fixed inset-0 pointer-events-none z-[90]" aria-hidden="true"></canvas>
 
     <!-- Lightbox: zvětšení obrázku -->
@@ -551,8 +574,16 @@
         const scoreNum = document.getElementById('scoreNum');
         const scoreBar = document.getElementById('scoreBar');
         const scoreWrap = document.getElementById('scoreWrap');
-        const scoreMsg = document.getElementById('scoreMsg');
         let shownScore = 0;
+
+        const toast = document.getElementById('toast');
+        let toastTimer = null;
+        function showToast(text, ms) {
+            toast.textContent = text;
+            toast.classList.add('show');
+            clearTimeout(toastTimer);
+            toastTimer = setTimeout(function () { toast.classList.remove('show'); }, ms || 1800);
+        }
 
         function animateScore(to) {
             const from = shownScore;
@@ -567,7 +598,6 @@
             scoreWrap.classList.remove('score-bump');
             void scoreWrap.offsetWidth;
             scoreWrap.classList.add('score-bump');
-            scoreMsg.classList.toggle('hidden', to !== TOTAL_POINTS);
         }
 
         const confettiCanvas = document.getElementById('confetti');
@@ -638,23 +668,87 @@
             });
         }
 
-        document.querySelectorAll('.check-btn').forEach(function (btn) {
+        // Hláška pro každý krok jiná
+        const stepMessages = {
+            mistnost: 'Základ stojí! Místnost je hotová 🏠',
+            okno: 'Světlo dovnitř! Okna jsou na světě 🪟',
+            dvere: 'Cesta dovnitř je volná 🚪',
+            kancelar: 'Pracovní kout je připravený 💻',
+            postel: 'Sladké sny! Postel je na místě 🛏️',
+            ostatni: 'Pokoj dostal duši, je zařízeno ✨'
+        };
+        const ALL_DONE_MESSAGE = '🎉 Všechno splněno, skvělá práce!';
+
+        const allChecks = Array.from(document.querySelectorAll('.check-btn'));
+        const odevBtn = document.querySelector('.check-btn[data-tab="odevzdani"]');
+        const otherChecks = allChecks.filter(function (b) { return b !== odevBtn; });
+        const isChecked = function (b) { return b.getAttribute('aria-checked') === 'true'; };
+
+        // Odevzdání je zamčené, dokud nejsou odškrtnuté všechny předchozí kroky
+        function updateLock() {
+            const unlocked = otherChecks.every(isChecked);
+            odevBtn.dataset.locked = unlocked ? 'false' : 'true';
+            odevBtn.setAttribute('aria-disabled', unlocked ? 'false' : 'true');
+            odevBtn.title = unlocked ? '' : 'Nejdřív splň všechny předchozí kroky';
+            return unlocked;
+        }
+
+        function setChecked(btn, done) {
+            btn.setAttribute('aria-checked', done ? 'true' : 'false');
+            btn.closest('.zadani-item').classList.toggle('done', done);
+
+            // fajvka u odpovídající záložky v menu
+            const tabBtn = document.querySelector('.tab-btn[data-target="' + btn.dataset.tab + '"]');
+            if (tabBtn) {
+                const old = tabBtn.querySelector('.tab-check');
+                if (old) old.remove();
+                if (done) {
+                    const mark = document.createElement('span');
+                    mark.className = 'tab-check ml-2 inline-flex h-5 w-5 items-center justify-center rounded-full bg-emerald-500 text-white text-xs align-middle';
+                    mark.setAttribute('aria-label', 'splněno');
+                    mark.textContent = '✓';
+                    tabBtn.appendChild(mark);
+                }
+            }
+        }
+
+        updateLock();
+
+        allChecks.forEach(function (btn) {
             btn.addEventListener('click', function (e) {
                 e.stopPropagation(); // nepřeskakovat na návod
-                const done = btn.getAttribute('aria-checked') !== 'true';
-                btn.setAttribute('aria-checked', done ? 'true' : 'false');
-                btn.closest('.zadani-item').classList.toggle('done', done);
+
+                const wasUnlocked = otherChecks.every(isChecked);
+                if (btn === odevBtn && !wasUnlocked) {
+                    showToast('Nejdřív splň všechny předchozí kroky 🔒');
+                    return;
+                }
+
+                const done = !isChecked(btn);
+                setChecked(btn, done);
+
+                // Když někdo odškrtne dřívější krok, odevzdání se zase vrátí do nesplněného stavu
+                if (!done && btn !== odevBtn && isChecked(odevBtn)) setChecked(odevBtn, false);
+                const unlocked = updateLock();
 
                 let total = 0;
-                document.querySelectorAll('.check-btn[aria-checked="true"]').forEach(function (b) {
-                    total += parseInt(b.dataset.pts, 10);
+                allChecks.forEach(function (b) {
+                    if (isChecked(b)) total += parseInt(b.dataset.pts, 10);
                 });
                 animateScore(total);
 
                 if (done) {
                     const r = btn.getBoundingClientRect();
                     burst(r.left + r.width / 2, r.top + r.height / 2, 40);
-                    if (total === TOTAL_POINTS) bigCelebration();
+                    const allDone = allChecks.every(isChecked);
+                    if (allDone) {
+                        showToast(ALL_DONE_MESSAGE, 3000);
+                        bigCelebration();
+                    } else {
+                        let msg = stepMessages[btn.dataset.tab] || 'Super! 👍';
+                        if (unlocked && !wasUnlocked) msg += '\n📤 Odevzdání je odemčené!';
+                        showToast(msg, unlocked && !wasUnlocked ? 2400 : 1800);
+                    }
                 }
             });
         });
