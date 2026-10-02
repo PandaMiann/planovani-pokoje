@@ -194,8 +194,9 @@
                     </div>
                 </div>
 
-                <div class="bg-gradient-to-r from-amber-50 to-orange-50 p-6 rounded-2xl border border-amber-200">
-                    <p class="text-amber-900 text-lg font-medium leading-relaxed">
+                <div role="button" tabindex="0" onclick="goToStep('barvicky')" onkeydown="if(event.target!==this)return;if(event.key==='Enter'||event.key===' '){event.preventDefault();goToStep('barvicky')}" class="zadani-item flex items-start gap-4 bg-gradient-to-r from-amber-50 to-orange-50 p-6 rounded-2xl border border-amber-200 cursor-pointer transition hover:shadow-md hover:-translate-y-0.5 focus:outline-none focus-visible:ring-4 focus-visible:ring-indigo-300">
+                    <button type="button" role="checkbox" data-tab="barvicky" aria-checked="false" aria-label="Označit jako splněné" data-pts="0" class="check-btn shrink-0 mt-0.5 h-8 w-8 rounded-lg border-2 border-amber-300 bg-white flex items-center justify-center focus:outline-none focus-visible:ring-4 focus-visible:ring-emerald-300"><svg class="check-svg h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="4"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg></button>
+                    <p class="label-text text-amber-900 text-lg font-medium leading-relaxed">
                         <span class="text-2xl mr-2">✨</span>
                         <strong>Máš už vše hotové?</strong> Zkus změnit barvičky jednotlivých předmětů! Dále si můžeš přidat jakýkoliv další nábytek nebo výzdobu do svého pokoje. Fantazií se meze nekladou 😊.
                     </p>
@@ -604,6 +605,7 @@
         const cctx = confettiCanvas.getContext('2d');
         const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
         let particles = [];
+        let blobs = [];
         let animating = false;
 
         function resizeConfetti() {
@@ -635,11 +637,69 @@
             if (!animating) { animating = true; requestAnimationFrame(stepConfetti); }
         }
 
+        // Color splash: barevné "fleky" a kapky, které se rozstříknou
+        function splash(x, y) {
+            if (reduceMotion) return;
+            const colors = ['#ef4444', '#f59e0b', '#facc15', '#22c55e', '#06b6d4', '#3b82f6', '#a855f7', '#ec4899'];
+            const pick = function () { return colors[Math.floor(Math.random() * colors.length)]; };
+
+            for (let i = 0; i < 6; i++) {
+                const ang = Math.random() * Math.PI * 2;
+                const dist = 20 + Math.random() * 90;
+                const R = 32 + Math.random() * 45;
+                const circles = [{ dx: 0, dy: 0, r: 1 }];
+                for (let k = 0; k < 5; k++) {
+                    const a = Math.random() * Math.PI * 2;
+                    circles.push({ dx: Math.cos(a) * R * 0.6, dy: Math.sin(a) * R * 0.6, r: 0.3 + Math.random() * 0.35 });
+                }
+                blobs.push({
+                    x: x + Math.cos(ang) * dist,
+                    y: y + Math.sin(ang) * dist,
+                    R: R, color: pick(), circles: circles,
+                    age: -Math.floor(Math.random() * 6)
+                });
+            }
+
+            for (let i = 0; i < 28; i++) {
+                const ang = Math.random() * Math.PI * 2;
+                const speed = 3 + Math.random() * 9;
+                particles.push({
+                    x: x, y: y,
+                    vx: Math.cos(ang) * speed,
+                    vy: Math.sin(ang) * speed,
+                    g: 0.18,
+                    round: true,
+                    size: 3 + Math.random() * 6,
+                    color: pick(),
+                    rot: 0, vr: 0,
+                    life: 55 + Math.random() * 25
+                });
+            }
+            if (!animating) { animating = true; requestAnimationFrame(stepConfetti); }
+        }
+
         function stepConfetti() {
             cctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+            blobs = blobs.filter(function (b) { return b.age < 80; });
+            blobs.forEach(function (b) {
+                b.age += 1;
+                if (b.age < 0) return;
+                const t = Math.min(b.age / 10, 1);
+                const sc = 1 - Math.pow(1 - t, 3);
+                cctx.save();
+                cctx.globalAlpha = b.age > 50 ? Math.max(0, 0.9 * (1 - (b.age - 50) / 30)) : 0.9;
+                cctx.fillStyle = b.color;
+                b.circles.forEach(function (c) {
+                    cctx.beginPath();
+                    cctx.arc(b.x + c.dx * sc, b.y + c.dy * sc, Math.max(0.1, b.R * c.r * sc), 0, Math.PI * 2);
+                    cctx.fill();
+                });
+                cctx.restore();
+            });
+
             particles = particles.filter(function (p) { return p.life > 0 && p.y < window.innerHeight + 40; });
             particles.forEach(function (p) {
-                p.vy += 0.35;
+                p.vy += (p.g === undefined ? 0.35 : p.g);
                 p.vx *= 0.99;
                 p.x += p.vx;
                 p.y += p.vy;
@@ -650,10 +710,16 @@
                 cctx.translate(p.x, p.y);
                 cctx.rotate(p.rot);
                 cctx.fillStyle = p.color;
-                cctx.fillRect(-p.size / 2, -p.size / 4, p.size, p.size / 2);
+                if (p.round) {
+                    cctx.beginPath();
+                    cctx.arc(0, 0, p.size, 0, Math.PI * 2);
+                    cctx.fill();
+                } else {
+                    cctx.fillRect(-p.size / 2, -p.size / 4, p.size, p.size / 2);
+                }
                 cctx.restore();
             });
-            if (particles.length) {
+            if (particles.length || blobs.length) {
                 requestAnimationFrame(stepConfetti);
             } else {
                 animating = false;
@@ -675,21 +741,26 @@
             dvere: 'Cesta dovnitř je volná 🚪',
             kancelar: 'Pracovní kout je připravený 💻',
             postel: 'Sladké sny! Postel je na místě 🛏️',
-            ostatni: 'Pokoj dostal duši, je zařízeno ✨'
+            ostatni: 'Pokoj dostal duši, je zařízeno ✨',
+            barvicky: 'Bonus splněn! Pokoj jako z katalogu 🎨'
         };
         const ALL_DONE_MESSAGE = '🎉 Všechno splněno, skvělá práce!';
 
         const allChecks = Array.from(document.querySelectorAll('.check-btn'));
         const odevBtn = document.querySelector('.check-btn[data-tab="odevzdani"]');
-        const otherChecks = allChecks.filter(function (b) { return b !== odevBtn; });
+        const bonusBtn = document.querySelector('.check-btn[data-tab="barvicky"]');
+        const otherChecks = allChecks.filter(function (b) { return b !== odevBtn && b !== bonusBtn; });
+        const requiredChecks = allChecks.filter(function (b) { return b !== bonusBtn; });
         const isChecked = function (b) { return b.getAttribute('aria-checked') === 'true'; };
 
         // Odevzdání je zamčené, dokud nejsou odškrtnuté všechny předchozí kroky
         function updateLock() {
             const unlocked = otherChecks.every(isChecked);
-            odevBtn.dataset.locked = unlocked ? 'false' : 'true';
-            odevBtn.setAttribute('aria-disabled', unlocked ? 'false' : 'true');
-            odevBtn.title = unlocked ? '' : 'Nejdřív splň všechny předchozí kroky';
+            [odevBtn, bonusBtn].forEach(function (b) {
+                b.dataset.locked = unlocked ? 'false' : 'true';
+                b.setAttribute('aria-disabled', unlocked ? 'false' : 'true');
+                b.title = unlocked ? '' : 'Nejdřív splň všechny předchozí kroky';
+            });
             return unlocked;
         }
 
@@ -719,7 +790,7 @@
                 e.stopPropagation(); // nepřeskakovat na návod
 
                 const wasUnlocked = otherChecks.every(isChecked);
-                if (btn === odevBtn && !wasUnlocked) {
+                if ((btn === odevBtn || btn === bonusBtn) && !wasUnlocked) {
                     showToast('Nejdřív splň všechny předchozí kroky 🔒');
                     return;
                 }
@@ -728,7 +799,10 @@
                 setChecked(btn, done);
 
                 // Když někdo odškrtne dřívější krok, odevzdání se zase vrátí do nesplněného stavu
-                if (!done && btn !== odevBtn && isChecked(odevBtn)) setChecked(odevBtn, false);
+                if (!done && btn !== odevBtn && btn !== bonusBtn) {
+                    if (isChecked(odevBtn)) setChecked(odevBtn, false);
+                    if (isChecked(bonusBtn)) setChecked(bonusBtn, false);
+                }
                 const unlocked = updateLock();
 
                 let total = 0;
@@ -739,14 +813,20 @@
 
                 if (done) {
                     const r = btn.getBoundingClientRect();
-                    burst(r.left + r.width / 2, r.top + r.height / 2, 40);
-                    const allDone = allChecks.every(isChecked);
-                    if (allDone) {
+                    if (btn === bonusBtn) {
+                        splash(r.left + r.width / 2, r.top + r.height / 2);
+                    } else {
+                        burst(r.left + r.width / 2, r.top + r.height / 2, 40);
+                    }
+                    const allDone = requiredChecks.every(isChecked);
+                    if (btn === bonusBtn) {
+                        showToast(stepMessages.barvicky, 2200);
+                    } else if (allDone) {
                         showToast(ALL_DONE_MESSAGE, 3000);
                         bigCelebration();
                     } else {
                         let msg = stepMessages[btn.dataset.tab] || 'Super! 👍';
-                        if (unlocked && !wasUnlocked) msg += '\n📤 Odevzdání je odemčené!';
+                        if (unlocked && !wasUnlocked) msg += '\n📤 Odevzdání a ⭐ bonus jsou odemčené!';
                         showToast(msg, unlocked && !wasUnlocked ? 2400 : 1800);
                     }
                 }
