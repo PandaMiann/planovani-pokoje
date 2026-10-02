@@ -60,6 +60,17 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
+        .check-btn { transition: background-color .2s, border-color .2s, transform .25s cubic-bezier(.34,1.56,.64,1); }
+        .check-btn:hover { border-color: #10b981; transform: scale(1.1); }
+        .check-btn[aria-checked="true"] { background: #10b981; border-color: #10b981; transform: scale(1.1); }
+        .check-svg { opacity: 0; transform: scale(.3); transition: opacity .2s, transform .3s cubic-bezier(.34,1.56,.64,1); }
+        .check-btn[aria-checked="true"] .check-svg { opacity: 1; transform: scale(1); }
+        .zadani-item .label-text { transition: opacity .25s; text-decoration-thickness: 2px; }
+        .zadani-item.done .label-text { text-decoration-line: line-through; opacity: .55; }
+        .zadani-item.done .pts { background: #d1fae5; }
+        @keyframes scoreBump { 0% { transform: scale(1); } 40% { transform: scale(1.35); } 100% { transform: scale(1); } }
+        .score-bump { animation: scoreBump .4s ease-out; }
+
         .tab-content img {
             max-width: min(100%, 480px);
             max-height: 340px;
@@ -117,36 +128,46 @@
 
                 <div class="mb-8">
                     <h3 class="text-xl font-bold mb-2 text-slate-700 border-b-2 border-slate-100 pb-2">Hodnocení a požadavky:</h3>
-                    <p class="text-slate-500 text-lg mb-4">👆 Klikni na položku a přeskočíš rovnou na její návod.</p>
+                    <p class="text-slate-500 text-lg mb-4">👆 Klikni na položku pro její návod. Až ji dokončíš, odškrtni ji čtverečkem.</p>
                     
                     <ul class="space-y-3">
-                        <li role="button" tabindex="0" onclick="goToStep('mistnost')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();goToStep('mistnost')}" class="flex items-center justify-between bg-pastel-blue/30 p-5 rounded-xl border border-blue-100 cursor-pointer transition hover:shadow-md hover:-translate-y-0.5 focus:outline-none focus-visible:ring-4 focus-visible:ring-indigo-300">
-                            <span class="font-semibold text-lg md:text-xl text-blue-900">📐 Rozměry pokoje: 600 cm x 700 cm</span>
-                            <span class="bg-white px-4 py-1.5 text-lg md:text-xl rounded-lg font-bold text-blue-600 shadow-sm">1b</span>
+                        <li role="button" tabindex="0" onclick="goToStep('mistnost')" onkeydown="if(event.target!==this)return;if(event.key==='Enter'||event.key===' '){event.preventDefault();goToStep('mistnost')}" class="zadani-item flex items-center justify-between bg-pastel-blue/30 p-5 rounded-xl border border-blue-100 cursor-pointer transition hover:shadow-md hover:-translate-y-0.5 focus:outline-none focus-visible:ring-4 focus-visible:ring-indigo-300">
+                            <span class="flex items-start gap-4"><button type="button" role="checkbox" aria-checked="false" aria-label="Označit jako splněné" data-pts="1" class="check-btn shrink-0 mt-0.5 h-8 w-8 rounded-lg border-2 border-slate-300 bg-white flex items-center justify-center focus:outline-none focus-visible:ring-4 focus-visible:ring-emerald-300"><svg class="check-svg h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="4"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg></button><span class="label-text font-semibold text-lg md:text-xl text-blue-900">📐 Rozměry pokoje: 600 cm x 700 cm</span></span>
+                            <span class="pts bg-white px-4 py-1.5 text-lg md:text-xl rounded-lg font-bold text-blue-600 shadow-sm">1b</span>
                         </li>
-                        <li role="button" tabindex="0" onclick="goToStep('okno')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();goToStep('okno')}" class="flex items-center justify-between bg-pastel-green/30 p-5 rounded-xl border border-green-100 cursor-pointer transition hover:shadow-md hover:-translate-y-0.5 focus:outline-none focus-visible:ring-4 focus-visible:ring-indigo-300">
-                            <span class="font-semibold text-lg md:text-xl text-emerald-900">🪟 3x okno</span>
-                            <span class="bg-white px-4 py-1.5 text-lg md:text-xl rounded-lg font-bold text-emerald-600 shadow-sm">3b</span>
+                        <li role="button" tabindex="0" onclick="goToStep('okno')" onkeydown="if(event.target!==this)return;if(event.key==='Enter'||event.key===' '){event.preventDefault();goToStep('okno')}" class="zadani-item flex items-center justify-between bg-pastel-green/30 p-5 rounded-xl border border-green-100 cursor-pointer transition hover:shadow-md hover:-translate-y-0.5 focus:outline-none focus-visible:ring-4 focus-visible:ring-indigo-300">
+                            <span class="flex items-start gap-4"><button type="button" role="checkbox" aria-checked="false" aria-label="Označit jako splněné" data-pts="3" class="check-btn shrink-0 mt-0.5 h-8 w-8 rounded-lg border-2 border-slate-300 bg-white flex items-center justify-center focus:outline-none focus-visible:ring-4 focus-visible:ring-emerald-300"><svg class="check-svg h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="4"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg></button><span class="label-text font-semibold text-lg md:text-xl text-emerald-900">🪟 3x okno</span></span>
+                            <span class="pts bg-white px-4 py-1.5 text-lg md:text-xl rounded-lg font-bold text-emerald-600 shadow-sm">3b</span>
                         </li>
-                        <li role="button" tabindex="0" onclick="goToStep('dvere')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();goToStep('dvere')}" class="flex items-center justify-between bg-pastel-pink/30 p-5 rounded-xl border border-pink-100 cursor-pointer transition hover:shadow-md hover:-translate-y-0.5 focus:outline-none focus-visible:ring-4 focus-visible:ring-indigo-300">
-                            <span class="font-semibold text-lg md:text-xl text-pink-900">🚪 1x dveře</span>
-                            <span class="bg-white px-4 py-1.5 text-lg md:text-xl rounded-lg font-bold text-pink-600 shadow-sm">1b</span>
+                        <li role="button" tabindex="0" onclick="goToStep('dvere')" onkeydown="if(event.target!==this)return;if(event.key==='Enter'||event.key===' '){event.preventDefault();goToStep('dvere')}" class="zadani-item flex items-center justify-between bg-pastel-pink/30 p-5 rounded-xl border border-pink-100 cursor-pointer transition hover:shadow-md hover:-translate-y-0.5 focus:outline-none focus-visible:ring-4 focus-visible:ring-indigo-300">
+                            <span class="flex items-start gap-4"><button type="button" role="checkbox" aria-checked="false" aria-label="Označit jako splněné" data-pts="1" class="check-btn shrink-0 mt-0.5 h-8 w-8 rounded-lg border-2 border-slate-300 bg-white flex items-center justify-center focus:outline-none focus-visible:ring-4 focus-visible:ring-emerald-300"><svg class="check-svg h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="4"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg></button><span class="label-text font-semibold text-lg md:text-xl text-pink-900">🚪 1x dveře</span></span>
+                            <span class="pts bg-white px-4 py-1.5 text-lg md:text-xl rounded-lg font-bold text-pink-600 shadow-sm">1b</span>
                         </li>
-                        <li role="button" tabindex="0" onclick="goToStep('kancelar')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();goToStep('kancelar')}" class="flex flex-col sm:flex-row sm:items-center justify-between bg-pastel-purple/30 p-5 rounded-xl border border-purple-100 gap-2 cursor-pointer transition hover:shadow-md hover:-translate-y-0.5 focus:outline-none focus-visible:ring-4 focus-visible:ring-indigo-300">
-                            <span class="font-semibold text-lg md:text-xl text-purple-900">📎 Kancelářské potřeby: <span class="font-normal text-purple-800">1x stůl, 1x PC myš, 1x klávesnice, 1x monitor, 1x kancelářské křeslo</span></span>
-                            <span class="bg-white px-4 py-1.5 text-lg md:text-xl rounded-lg font-bold text-purple-600 shadow-sm self-start sm:self-auto">5b</span>
+                        <li role="button" tabindex="0" onclick="goToStep('kancelar')" onkeydown="if(event.target!==this)return;if(event.key==='Enter'||event.key===' '){event.preventDefault();goToStep('kancelar')}" class="zadani-item flex flex-col sm:flex-row sm:items-center justify-between bg-pastel-purple/30 p-5 rounded-xl border border-purple-100 gap-2 cursor-pointer transition hover:shadow-md hover:-translate-y-0.5 focus:outline-none focus-visible:ring-4 focus-visible:ring-indigo-300">
+                            <span class="flex items-start gap-4"><button type="button" role="checkbox" aria-checked="false" aria-label="Označit jako splněné" data-pts="5" class="check-btn shrink-0 mt-0.5 h-8 w-8 rounded-lg border-2 border-slate-300 bg-white flex items-center justify-center focus:outline-none focus-visible:ring-4 focus-visible:ring-emerald-300"><svg class="check-svg h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="4"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg></button><span class="label-text font-semibold text-lg md:text-xl text-purple-900">📎 Kancelářské potřeby: <span class="font-normal text-purple-800">1x stůl, 1x PC myš, 1x klávesnice, 1x monitor, 1x kancelářské křeslo</span></span></span>
+                            <span class="pts bg-white px-4 py-1.5 text-lg md:text-xl rounded-lg font-bold text-purple-600 shadow-sm self-start sm:self-auto">5b</span>
                         </li>
-                        <li role="button" tabindex="0" onclick="goToStep('postel')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();goToStep('postel')}" class="flex items-center justify-between bg-pastel-orange/30 p-5 rounded-xl border border-orange-100 cursor-pointer transition hover:shadow-md hover:-translate-y-0.5 focus:outline-none focus-visible:ring-4 focus-visible:ring-indigo-300">
-                            <span class="font-semibold text-lg md:text-xl text-orange-900">🛏️ 1x postel</span>
-                            <span class="bg-white px-4 py-1.5 text-lg md:text-xl rounded-lg font-bold text-orange-600 shadow-sm">1b</span>
+                        <li role="button" tabindex="0" onclick="goToStep('postel')" onkeydown="if(event.target!==this)return;if(event.key==='Enter'||event.key===' '){event.preventDefault();goToStep('postel')}" class="zadani-item flex items-center justify-between bg-pastel-orange/30 p-5 rounded-xl border border-orange-100 cursor-pointer transition hover:shadow-md hover:-translate-y-0.5 focus:outline-none focus-visible:ring-4 focus-visible:ring-indigo-300">
+                            <span class="flex items-start gap-4"><button type="button" role="checkbox" aria-checked="false" aria-label="Označit jako splněné" data-pts="1" class="check-btn shrink-0 mt-0.5 h-8 w-8 rounded-lg border-2 border-slate-300 bg-white flex items-center justify-center focus:outline-none focus-visible:ring-4 focus-visible:ring-emerald-300"><svg class="check-svg h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="4"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg></button><span class="label-text font-semibold text-lg md:text-xl text-orange-900">🛏️ 1x postel</span></span>
+                            <span class="pts bg-white px-4 py-1.5 text-lg md:text-xl rounded-lg font-bold text-orange-600 shadow-sm">1b</span>
                         </li>
-                        <li role="button" tabindex="0" onclick="goToStep('ostatni')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();goToStep('ostatni')}" class="flex flex-col sm:flex-row sm:items-center justify-between bg-slate-100 p-5 rounded-xl border border-slate-200 gap-2 cursor-pointer transition hover:shadow-md hover:-translate-y-0.5 focus:outline-none focus-visible:ring-4 focus-visible:ring-indigo-300">
-                            <span class="font-semibold text-lg md:text-xl text-slate-800">✨ Ostatní: <span class="font-normal text-slate-600">1x skříň, 1x komoda, 1x koberec, 1x lampa</span></span>
-                            <span class="bg-white px-4 py-1.5 text-lg md:text-xl rounded-lg font-bold text-slate-600 shadow-sm self-start sm:self-auto">4b</span>
+                        <li role="button" tabindex="0" onclick="goToStep('ostatni')" onkeydown="if(event.target!==this)return;if(event.key==='Enter'||event.key===' '){event.preventDefault();goToStep('ostatni')}" class="zadani-item flex flex-col sm:flex-row sm:items-center justify-between bg-slate-100 p-5 rounded-xl border border-slate-200 gap-2 cursor-pointer transition hover:shadow-md hover:-translate-y-0.5 focus:outline-none focus-visible:ring-4 focus-visible:ring-indigo-300">
+                            <span class="flex items-start gap-4"><button type="button" role="checkbox" aria-checked="false" aria-label="Označit jako splněné" data-pts="4" class="check-btn shrink-0 mt-0.5 h-8 w-8 rounded-lg border-2 border-slate-300 bg-white flex items-center justify-center focus:outline-none focus-visible:ring-4 focus-visible:ring-emerald-300"><svg class="check-svg h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="4"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg></button><span class="label-text font-semibold text-lg md:text-xl text-slate-800">✨ Ostatní: <span class="font-normal text-slate-600">1x skříň, 1x komoda, 1x koberec, 1x lampa</span></span></span>
+                            <span class="pts bg-white px-4 py-1.5 text-lg md:text-xl rounded-lg font-bold text-slate-600 shadow-sm self-start sm:self-auto">4b</span>
                         </li>
                     </ul>
                     
-                    <div class="mt-4 flex justify-end">
+                    <div class="mt-5 flex flex-wrap items-center justify-between gap-4">
+                        <div class="flex-1 min-w-[16rem] bg-emerald-50 border-2 border-emerald-200 rounded-2xl px-5 py-3">
+                            <div class="flex items-baseline justify-between gap-3">
+                                <span class="font-bold text-emerald-900 text-lg">⭐ Moje získané body:</span>
+                                <span id="scoreWrap" class="font-extrabold text-emerald-700 text-2xl inline-block"><span id="scoreNum">0</span> / 15</span>
+                            </div>
+                            <div class="mt-2 h-3 rounded-full bg-white overflow-hidden">
+                                <div id="scoreBar" class="h-full rounded-full bg-emerald-500" style="width:0%; transition: width 0.5s ease;"></div>
+                            </div>
+                            <p id="scoreMsg" class="hidden mt-2 text-emerald-800 font-semibold">🎉 Všechno splněno, skvělá práce!</p>
+                        </div>
                         <div class="bg-slate-800 text-white px-6 py-3 rounded-xl font-bold text-xl shadow-lg transform rotate-2 transition-transform duration-300 ease-out hover:rotate-0 hover:scale-110 active:rotate-0 active:scale-110 cursor-default">
                             CELKEM: <span class="text-amber-300">15b</span>
                         </div>
@@ -233,7 +254,7 @@
                         <div class="bg-indigo-50 border border-indigo-200 rounded-2xl p-5 mb-6">
                             <p class="font-bold text-indigo-900 mb-3">Co hledat? Anglické názvy:</p>
                             <ul class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-lg text-slate-700">
-                                <li>🏠 stavba: <strong>structure</strong></li>
+                                <li>🏠 místnost: <strong>Room</strong></li>
                             </ul>
                         </div>
                         
@@ -263,7 +284,7 @@
                             <p class="font-bold text-blue-900 mb-1">Co hledat? Anglické názvy:</p>
                             <p class="text-base text-slate-600 mb-3">Záložka v menu: <strong>Doors & windows</strong></p>
                             <ul class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-lg text-slate-700">
-                                <li>🪟 okno: <strong>window</strong></li>
+                                <li>🪟 okno: <strong>Window</strong></li>
                             </ul>
                         </div>
                         
@@ -293,7 +314,7 @@
                             <p class="font-bold text-amber-900 mb-1">Co hledat? Anglické názvy:</p>
                             <p class="text-base text-slate-600 mb-3">Záložka v menu: <strong>Doors & windows</strong></p>
                             <ul class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-lg text-slate-700">
-                                <li>🚪 dveře: <strong>door</strong></li>
+                                <li>🚪 dveře: <strong>Door</strong></li>
                             </ul>
                         </div>
                         
@@ -323,11 +344,11 @@
                             <p class="font-bold text-gray-900 mb-1">Co hledat? Anglické názvy:</p>
                             <p class="text-base text-slate-600 mb-3">Záložka v menu: <strong>Office</strong></p>
                             <ul class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-lg text-slate-700">
-                                <li>🖥️ stůl: <strong>desk</strong></li>
-                                <li>🪑 kancelářské křeslo: <strong>chair</strong></li>
-                                <li>🖥️ monitor: <strong>monitor</strong></li>
-                                <li>⌨️ klávesnice: <strong>keyboard</strong></li>
-                                <li>🖱️ myš: <strong>mouse</strong></li>
+                                <li>🖥️ stůl: <strong>Desk</strong></li>
+                                <li>🪑 kancelářské křeslo: <strong>Chair</strong></li>
+                                <li>🖥️ monitor: <strong>Monitor</strong></li>
+                                <li>⌨️ klávesnice: <strong>Keyboard</strong></li>
+                                <li>🖱️ myš: <strong>Mouse</strong></li>
                             </ul>
                         </div>
                         
@@ -350,7 +371,7 @@
                             <p class="font-bold text-rose-900 mb-1">Co hledat? Anglické názvy:</p>
                             <p class="text-base text-slate-600 mb-3">Záložka v menu: <strong>Bedroom</strong></p>
                             <ul class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-lg text-slate-700">
-                                <li>🛏️ postel: <strong>bed</strong> nebo <strong>bunk bed</strong></li>
+                                <li>🛏️ postel: <strong>Bed</strong></li>
                             </ul>
                         </div>
                         
@@ -373,9 +394,9 @@
                             <p class="font-bold text-teal-900 mb-1">Co hledat? Anglické názvy:</p>
                             <p class="text-base text-slate-600 mb-3">Záložka v menu: <strong>General</strong></p>
                             <ul class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-lg text-slate-700">
-                                <li>🚪 skříň: <strong>closet</strong></li>
-                                <li>🗄️ komoda: <strong>dresser</strong></li>
-                                <li>🟫 koberec: <strong>rug</strong></li>
+                                <li>🚪 skříň: <strong>wardrobe</strong> / <strong>closet</strong></li>
+                                <li>🗄️ komoda: <strong>dresser</strong> / <strong>chest of drawers</strong></li>
+                                <li>🟫 koberec: <strong>rug</strong> / <strong>carpet</strong></li>
                                 <li>💡 lampa: <strong>lamp</strong></li>
                             </ul>
                         </div>
@@ -401,7 +422,7 @@
                         <div class="bg-fuchsia-50 border border-fuchsia-200 rounded-2xl p-5 mb-6">
                             <p class="font-bold text-fuchsia-900 mb-3">Co hledat? Anglické názvy:</p>
                             <ul class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-lg text-slate-700">
-                                <li>🎨 barva: <strong>color</strong> (tlačítko na levé liště)</li>
+                                <li>🎨 barva: <strong>Color</strong> (tlačítko na levé liště)</li>
                             </ul>
                         </div>
                         
@@ -452,19 +473,6 @@
                             <img src="images/odevzdani3.png" alt="Ukázka 3D modelu" class="rounded-xl shadow-md border border-slate-100 max-w-full h-auto mt-2">
                         </div>
 
-                        <div class="mt-10 bg-emerald-50 border-2 border-emerald-200 rounded-2xl p-6">
-                            <h4 class="text-xl font-bold text-emerald-900 mb-1">✅ Kontrola před odevzdáním</h4>
-                            <p class="text-slate-600 mb-4">Odškrtni si, co už máš hotové.</p>
-                            <ul class="space-y-2 text-lg text-slate-700">
-                                <li><label class="flex items-center gap-3 cursor-pointer"><input type="checkbox" class="h-5 w-5 accent-emerald-600"> 1x místnost 600 × 700 cm</label></li>
-                                <li><label class="flex items-center gap-3 cursor-pointer"><input type="checkbox" class="h-5 w-5 accent-emerald-600"> 3x okno</label></li>
-                                <li><label class="flex items-center gap-3 cursor-pointer"><input type="checkbox" class="h-5 w-5 accent-emerald-600"> 1x dveře</label></li>
-                                <li><label class="flex items-center gap-3 cursor-pointer"><input type="checkbox" class="h-5 w-5 accent-emerald-600"> 1x stůl, 1x PC myš, 1x klávesnice, 1x monitor, 1x kancelářské křeslo</label></li>
-                                <li><label class="flex items-center gap-3 cursor-pointer"><input type="checkbox" class="h-5 w-5 accent-emerald-600"> 1x postel</label></li>
-                                <li><label class="flex items-center gap-3 cursor-pointer"><input type="checkbox" class="h-5 w-5 accent-emerald-600"> 1x skříň, 1x komoda, 1x koberec, 1x lampa</label></li>
-                                <li><label class="flex items-center gap-3 cursor-pointer"><input type="checkbox" class="h-5 w-5 accent-emerald-600"> Mám snímek 2D i 3D pohledu a oba jsem vložil/a do Teams</label></li>
-                            </ul>
-                        </div>
                     </div>
                     
                 </div>
@@ -472,6 +480,8 @@
         </section>
         
     </main>
+
+    <canvas id="confetti" class="fixed inset-0 pointer-events-none z-[90]" aria-hidden="true"></canvas>
 
     <!-- Lightbox: zvětšení obrázku -->
     <div id="lightbox" class="hidden fixed inset-0 z-[100] bg-black/85 items-center justify-center p-4 cursor-zoom-out" role="dialog" aria-modal="true" aria-label="Zvětšený obrázek">
@@ -534,6 +544,119 @@
         lightbox.addEventListener('click', closeLightbox);
         document.addEventListener('keydown', function (e) {
             if (e.key === 'Escape') closeLightbox();
+        });
+
+        // ===== Odškrtávání splněných kroků, body a konfety =====
+        const TOTAL_POINTS = 15;
+        const scoreNum = document.getElementById('scoreNum');
+        const scoreBar = document.getElementById('scoreBar');
+        const scoreWrap = document.getElementById('scoreWrap');
+        const scoreMsg = document.getElementById('scoreMsg');
+        let shownScore = 0;
+
+        function animateScore(to) {
+            const from = shownScore;
+            shownScore = to;
+            const start = performance.now();
+            (function tick(now) {
+                const t = Math.min((now - start) / 400, 1);
+                scoreNum.textContent = Math.round(from + (to - from) * t);
+                if (t < 1) requestAnimationFrame(tick);
+            })(start);
+            scoreBar.style.width = (to / TOTAL_POINTS * 100) + '%';
+            scoreWrap.classList.remove('score-bump');
+            void scoreWrap.offsetWidth;
+            scoreWrap.classList.add('score-bump');
+            scoreMsg.classList.toggle('hidden', to !== TOTAL_POINTS);
+        }
+
+        const confettiCanvas = document.getElementById('confetti');
+        const cctx = confettiCanvas.getContext('2d');
+        const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        let particles = [];
+        let animating = false;
+
+        function resizeConfetti() {
+            const dpr = window.devicePixelRatio || 1;
+            confettiCanvas.width = window.innerWidth * dpr;
+            confettiCanvas.height = window.innerHeight * dpr;
+            cctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        }
+        resizeConfetti();
+        window.addEventListener('resize', resizeConfetti);
+
+        function burst(x, y, count) {
+            if (reduceMotion) return;
+            const colors = ['#fbbf24', '#f472b6', '#60a5fa', '#34d399', '#a78bfa', '#fb923c'];
+            for (let i = 0; i < count; i++) {
+                const angle = Math.random() * Math.PI * 2;
+                const speed = 4 + Math.random() * 9;
+                particles.push({
+                    x: x, y: y,
+                    vx: Math.cos(angle) * speed,
+                    vy: Math.sin(angle) * speed - 5,
+                    size: 6 + Math.random() * 6,
+                    color: colors[Math.floor(Math.random() * colors.length)],
+                    rot: Math.random() * Math.PI,
+                    vr: (Math.random() - 0.5) * 0.4,
+                    life: 90 + Math.random() * 40
+                });
+            }
+            if (!animating) { animating = true; requestAnimationFrame(stepConfetti); }
+        }
+
+        function stepConfetti() {
+            cctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+            particles = particles.filter(function (p) { return p.life > 0 && p.y < window.innerHeight + 40; });
+            particles.forEach(function (p) {
+                p.vy += 0.35;
+                p.vx *= 0.99;
+                p.x += p.vx;
+                p.y += p.vy;
+                p.rot += p.vr;
+                p.life -= 1;
+                cctx.save();
+                cctx.globalAlpha = Math.min(1, p.life / 30);
+                cctx.translate(p.x, p.y);
+                cctx.rotate(p.rot);
+                cctx.fillStyle = p.color;
+                cctx.fillRect(-p.size / 2, -p.size / 4, p.size, p.size / 2);
+                cctx.restore();
+            });
+            if (particles.length) {
+                requestAnimationFrame(stepConfetti);
+            } else {
+                animating = false;
+                cctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+            }
+        }
+
+        function bigCelebration() {
+            const w = window.innerWidth, h = window.innerHeight;
+            [0.2, 0.5, 0.8].forEach(function (fx, i) {
+                setTimeout(function () { burst(w * fx, h * 0.35, 90); }, i * 250);
+            });
+        }
+
+        document.querySelectorAll('.check-btn').forEach(function (btn) {
+            btn.addEventListener('click', function (e) {
+                e.stopPropagation(); // nepřeskakovat na návod
+                const done = btn.getAttribute('aria-checked') !== 'true';
+                btn.setAttribute('aria-checked', done ? 'true' : 'false');
+                btn.closest('.zadani-item').classList.toggle('done', done);
+
+                let total = 0;
+                document.querySelectorAll('.check-btn[aria-checked="true"]').forEach(function (b) {
+                    total += parseInt(b.dataset.pts, 10);
+                });
+                animateScore(total);
+
+                if (done) {
+                    const r = btn.getBoundingClientRect();
+                    burst(r.left + r.width / 2, r.top + r.height / 2, 40);
+                    if (total === TOTAL_POINTS) bigCelebration();
+                }
+            });
         });
 
         // Šipky < > mezi záložkami návodu
