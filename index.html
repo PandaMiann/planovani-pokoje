@@ -209,8 +209,9 @@
     <!-- Pás s tlačítky: přepínání obsahu -->
     <nav id="viewBar" aria-label="Přepínání obsahu" class="max-w-7xl mx-auto px-4 mb-8 scroll-mt-2">
         <div class="flex gap-3 overflow-x-auto no-scrollbar p-2 bg-white rounded-3xl shadow-md border border-slate-100">
-            <button type="button" data-view="prezentace" aria-pressed="false" class="view-btn ml-auto flex items-center gap-2 whitespace-nowrap rounded-2xl px-6 py-4 min-h-[56px] text-lg font-bold text-slate-600 bg-slate-50 hover:bg-indigo-50 transition">📽️ Prezentace</button>
+            <button type="button" data-view="prezentace" aria-pressed="false" class="view-btn ml-auto flex items-center gap-2 whitespace-nowrap rounded-2xl px-6 py-4 min-h-[56px] text-lg font-bold text-slate-600 bg-slate-50 hover:bg-indigo-50 transition">📊 Prezentace</button>
             <button type="button" data-view="zadani" aria-pressed="false" class="view-btn  flex items-center gap-2 whitespace-nowrap rounded-2xl px-6 py-4 min-h-[56px] text-lg font-bold text-slate-600 bg-slate-50 hover:bg-indigo-50 transition">📝 Zadání</button>
+            <button type="button" data-view="video" aria-pressed="false" class="view-btn  flex items-center gap-2 whitespace-nowrap rounded-2xl px-6 py-4 min-h-[56px] text-lg font-bold text-slate-600 bg-slate-50 hover:bg-indigo-50 transition">🎬 Video</button>
             <button type="button" data-view="krizovka" aria-pressed="false" class="view-btn mr-auto flex items-center gap-2 whitespace-nowrap rounded-2xl px-6 py-4 min-h-[56px] text-lg font-bold text-slate-600 bg-slate-50 hover:bg-indigo-50 transition">🧩 Křížovka</button>
         </div>
     </nav>
@@ -599,7 +600,7 @@
         <!-- PREZENTACE -->
         <div id="view-prezentace" class="hidden">
             <section class="bg-white rounded-[2rem] shadow-xl border-t-8 border-indigo-300 p-4 md:p-8 mb-16">
-                <h3 class="text-2xl md:text-3xl font-bold text-slate-800 mb-4">📽️ Modely a schémata</h3>
+                <h3 class="text-2xl md:text-3xl font-bold text-slate-800 mb-4">📊 Modely a schémata</h3>
                 <div id="slideStage" class="relative bg-slate-100 rounded-2xl overflow-hidden flex items-center justify-center min-h-[240px]" style="touch-action: pan-y;">
                     <canvas id="slideCanvas"></canvas>
                     <p id="slideMsg" class="absolute text-slate-500 text-lg px-4 text-center">Načítám prezentaci…</p>
@@ -611,6 +612,17 @@
                     <button type="button" id="slideFull" aria-label="Na celou obrazovku" class="hidden h-14 px-4 rounded-2xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xl font-bold">⛶</button>
                     <a id="slideOpen" target="_blank" rel="noopener noreferrer" class="h-14 px-4 rounded-2xl bg-slate-50 hover:bg-slate-100 text-slate-600 font-bold flex items-center">Otevřít PDF ↗</a>
                 </div>
+            </section>
+        </div>
+
+        <!-- VIDEO -->
+        <div id="view-video" class="hidden">
+            <section class="bg-white rounded-[2rem] shadow-xl border-t-8 border-red-300 p-4 md:p-8 mb-16">
+                <h3 class="text-2xl md:text-3xl font-bold text-slate-800 mb-4">🎬 Jak na myšlenkové mapy</h3>
+                <div class="relative w-full max-w-5xl mx-auto rounded-2xl overflow-hidden bg-black shadow-lg" style="aspect-ratio: 16 / 9;">
+                    <iframe id="videoFrame" title="Jak na myšlenkové mapy" class="absolute inset-0 w-full h-full" style="border:0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>
+                </div>
+                <p class="mt-4 text-center"><a href="https://www.youtube.com/watch?v=3cJHdgJFE1Y" target="_blank" rel="noopener noreferrer" class="inline-flex items-center min-h-[48px] px-5 rounded-2xl bg-slate-50 hover:bg-slate-100 text-slate-600 font-bold">Otevřít na YouTube ↗</a></p>
             </section>
         </div>
 
@@ -1069,7 +1081,7 @@
         let currentView = 'zadani';
         function showView(v, keepHash) {
             currentView = v;
-            ['prezentace', 'zadani', 'krizovka'].forEach(function (n) {
+            ['prezentace', 'video', 'zadani', 'krizovka'].forEach(function (n) {
                 document.getElementById('view-' + n).classList.toggle('hidden', n !== v);
             });
             document.querySelectorAll('.view-btn').forEach(function (b) {
@@ -1082,6 +1094,10 @@
             if (v !== 'krizovka') document.getElementById('cwInput').blur();
             if (v !== 'zadani') hiddenCls.forEach(function (c) { backBtn.classList.add(c); });
             if (v === 'prezentace') initSlides();
+            // video se načte až po otevření záložky a po odchodu se zastaví
+            const vf = document.getElementById('videoFrame');
+            if (v === 'video') { if (!vf.getAttribute('src')) vf.src = 'https://www.youtube-nocookie.com/embed/3cJHdgJFE1Y?rel=0'; }
+            else vf.removeAttribute('src');
             if (!keepHash) history.replaceState(null, '', v === 'zadani' ? location.pathname + location.search : '#' + v);
             if (!keepHash) document.getElementById('viewBar').scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
@@ -1437,7 +1453,7 @@
         }
     
         const startHash = location.hash.slice(1);
-        if (startHash === 'prezentace' || startHash === 'krizovka') showView(startHash, true);
+        if (startHash === 'prezentace' || startHash === 'video' || startHash === 'krizovka') showView(startHash, true);
         else showView('zadani', true);
     </script>
 </body>
