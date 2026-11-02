@@ -69,7 +69,7 @@
         .zadani-item.done .label-text { text-decoration-line: line-through; opacity: .55; }
         .zadani-item.done .pts { background: #d1fae5; }
         #toast {
-            bottom: calc(1.5rem + env(safe-area-inset-bottom, 0px));
+            bottom: calc(1.5rem + var(--cwdock, 0px) + env(safe-area-inset-bottom, 0px));
             max-width: min(90vw, 28rem);
             opacity: 0;
             transform: translate(-50%, 160%);
@@ -101,7 +101,7 @@
         .check-btn[data-locked="true"]::after { content: "🔒"; position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: .9rem; }
         #toast.show { opacity: 1; transform: translate(-50%, 0); }
         @media (max-width: 767px) {
-            #toast { bottom: calc(5.5rem + env(safe-area-inset-bottom, 0px)); } /* nad tlačítkem "Zpět na zadání" */
+            #toast { bottom: calc(5.5rem + var(--cwdock, 0px) + env(safe-area-inset-bottom, 0px)); } /* nad tlačítkem "Zpět na zadání" */
         }
         @media (prefers-reduced-motion: reduce) {
             #toast { transition: opacity .2s ease; transform: translate(-50%, 0); }
@@ -113,34 +113,60 @@
 
         .view-btn.active { background: #6366f1; color: #fff; box-shadow: 0 6px 14px rgba(99, 102, 241, .35); }
         #cwGrid {
-            --c: min(46px, calc((100vw - 3rem) / 15), calc((100vh - 17rem) / 15));
-            --c: min(46px, calc((100vw - 3rem) / 15), calc((100dvh - 17rem) / 15));
+            --c: min(46px, calc((100vw - 4rem - 28px) / 15), calc((100vh - 17rem) / 15));
+            --c: min(46px, calc((100vw - 4rem - 28px) / 15), calc((100dvh - 17rem) / 15));
             grid-template-columns: repeat(15, var(--c));
+        }
+        @media (min-width: 768px) {
+            #cwGrid {
+                --c: min(46px, calc((100vw - 6rem - 28px) / 15), calc((100vh - 17rem) / 15));
+                --c: min(46px, calc((100vw - 6rem - 28px) / 15), calc((100dvh - 17rem) / 15));
+            }
+        }
+        /* mobil na výšku: menší okraje, aby se tabulka vešla */
+        @media (max-width: 599px) {
+            main.cw-main { padding-left: .25rem; padding-right: .25rem; }
+            #view-krizovka section { padding: .5rem; border-radius: 1.25rem; }
+            #cwGrid { gap: 1px; --c: min(46px, calc((100vw - 1.5rem - 14px) / 15)); }
         }
         .cw-layout { display: flex; flex-direction: column; gap: 1rem; }
         .cw-right { display: contents; }
-        .cw-dock { position: sticky; bottom: 0; z-index: 20; background: rgba(255, 255, 255, .96); backdrop-filter: blur(6px); border-top: 2px solid #e0e7ff; padding: .6rem .25rem calc(.6rem + env(safe-area-inset-bottom, 0px)); }
+        /* vlastní klávesnice: jen tablety (dost široké i vysoké okno), přilepená k dolnímu okraji okna */
+        .cw-dock { display: none; position: fixed; left: 0; right: 0; bottom: 0; z-index: 40; background: #fff; border-top: 2px solid #e0e7ff; box-shadow: 0 -6px 18px rgba(15, 23, 42, .1); padding: .6rem .75rem calc(.6rem + env(safe-area-inset-bottom, 0px)); }
         .cw-keys { width: 100%; max-width: 44rem; margin: 0 auto; }
         .cw-row { display: flex; justify-content: center; gap: 6px; margin-bottom: 6px; }
         .cw-row:last-child { margin-bottom: 0; }
-        @media (min-width: 1024px) {
+        @media (min-width: 600px) and (min-height: 560px) {
+            .cw-dock { display: block; }
+            .cw-layout { padding-bottom: calc(var(--cwdock, 14rem) + .5rem); }
+        }
+        /* široký displej: tabulka vlevo, klávesnice a nápovědy vpravo */
+        @media (min-width: 1024px) and (min-height: 560px) {
             #cwGrid {
                 --c: min(44px, calc((100vh - 11rem) / 15), calc((100vw - 4rem - 28rem) / 15));
                 --c: min(44px, calc((100dvh - 11rem) / 15), calc((100vw - 4rem - 28rem) / 15));
             }
-            .cw-layout { display: grid; grid-template-columns: auto minmax(0, 1fr); column-gap: 2rem; align-items: start; }
+            .cw-layout { display: grid; grid-template-columns: auto minmax(0, 1fr); column-gap: 2rem; align-items: start; padding-bottom: 0; }
             .cw-gridblock { grid-column: 1; }
             .cw-right { display: block; grid-column: 2; }
-            .cw-dock { position: sticky; top: calc(var(--cwbar, 4.5rem) + 1.25rem); bottom: auto; z-index: 20; background: #fff; backdrop-filter: none; border: 2px solid #e0e7ff; border-radius: 1rem; padding: .75rem; }
+            .cw-dock { position: sticky; top: calc(var(--cwbar, 4.5rem) + 1.25rem); left: auto; right: auto; bottom: auto; z-index: 20; border: 2px solid #e0e7ff; border-radius: 1rem; padding: .75rem; box-shadow: none; }
             .cw-clues { margin-top: 1.5rem; }
         }
+        /* mobil na šířku: bez vlastní klávesnice (použije se systémová), tabulka vedle nápověd */
+        @media (max-height: 559px) and (min-width: 600px) {
+            #cwGrid { gap: 1px; --c: min(30px, calc((100vw - 3rem - 14px - 16rem) / 15)); }
+            .cw-layout { display: grid; grid-template-columns: auto minmax(0, 1fr); column-gap: 1rem; align-items: start; padding-bottom: 0; }
+            .cw-gridblock { grid-column: 1; }
+            .cw-right { display: block; grid-column: 2; }
+        }
+        #cwInput { position: fixed; left: 0; bottom: 0; width: 1px; height: 1px; opacity: 0; border: 0; padding: 0; font-size: 16px; pointer-events: none; }
         .cw-cell { position: relative; width: var(--c); height: var(--c); display: flex; align-items: center; justify-content: center; background: #fff; border: 2px solid #cbd5e1; border-radius: 6px; font-weight: 800; font-size: calc(var(--c) * .55); color: #1e293b; cursor: pointer; user-select: none; touch-action: manipulation; }
         .cw-cell .n { position: absolute; top: 1px; left: 3px; font-size: calc(var(--c) * .27); font-weight: 700; color: #64748b; line-height: 1; }
         .cw-cell.hl { background: #e0e7ff; }
         .cw-cell.ok { background: #d1fae5; color: #047857; }
         .cw-cell.bad { background: #fee2e2; color: #b91c1c; }
         .cw-cell.cur { background: #a5b4fc; border-color: #6366f1; }
-        .cw-key { flex: 0 0 calc((100% - 54px) / 10); height: clamp(3rem, 7vh, 3.75rem); border-radius: .75rem; background: #eef2ff; color: #3730a3; font-weight: 800; font-size: clamp(1.15rem, 2.6vh, 1.5rem); touch-action: manipulation; user-select: none; }
+        .cw-key { flex: 0 0 calc((100% - 54px) / 10); height: clamp(2.75rem, 7vh, 3.75rem); border-radius: .75rem; background: #eef2ff; color: #3730a3; font-weight: 800; font-size: clamp(1.15rem, 2.6vh, 1.5rem); touch-action: manipulation; user-select: none; }
         .cw-key.wide { flex-basis: calc(2 * (100% - 54px) / 10 + 6px); background: #e0e7ff; }
         .cw-key:active { background: #c7d2fe; }
         .cw-clue-item { text-align: left; padding: .5rem .75rem; border-radius: .75rem; background: #f8fafc; touch-action: manipulation; }
@@ -592,7 +618,8 @@
         <div id="view-krizovka" class="hidden">
             <section class="bg-white rounded-[2rem] shadow-xl border-t-8 border-pink-300 p-4 md:p-8 mb-16">
                 <h3 class="text-2xl md:text-3xl font-bold text-slate-800 mb-1">🧩 Křížovka: Modely a schémata</h3>
-                <p class="text-slate-500 mb-4">Klepni na políčko a piš na klávesnici pod křížovkou. Diakritiku psát nemusíš. Klepnutím na stejné políčko přepneš směr.</p>
+                <p class="text-slate-500 mb-4">Klepni na políčko a piš na klávesnici. Diakritiku psát nemusíš. Klepnutím na stejné políčko přepneš směr.</p>
+                <input id="cwInput" type="text" value=" " autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false" aria-label="Psaní do křížovky" tabindex="-1">
                 <div class="flex items-center gap-2 mb-4 bg-indigo-50 border-2 border-indigo-200 rounded-2xl p-2 sticky top-2 z-30">
                     <button type="button" id="cwPrev" aria-label="Předchozí nápověda" class="h-12 w-12 shrink-0 rounded-xl bg-white text-indigo-700 text-2xl font-bold shadow-sm">‹</button>
                     <p id="cwClue" class="flex-1 text-lg font-semibold text-indigo-900 text-center leading-snug"></p>
@@ -1051,6 +1078,8 @@
                 b.setAttribute('aria-pressed', on ? 'true' : 'false');
             });
             setGradePanel(false);
+            document.querySelector('main').classList.toggle('cw-main', v === 'krizovka');
+            if (v !== 'krizovka') document.getElementById('cwInput').blur();
             if (v !== 'zadani') hiddenCls.forEach(function (c) { backBtn.classList.add(c); });
             if (v === 'prezentace') initSlides();
             if (!keepHash) history.replaceState(null, '', v === 'zadani' ? location.pathname + location.search : '#' + v);
@@ -1062,7 +1091,7 @@
 
         // ===== Prezentace =====
         // PDF: dej soubor vedle index.html. Gamma: { type: 'gamma', src: 'https://gamma.app/embed/…' }
-        const PRESENTATION = { type: 'gamma', src: 'https://gamma.app/embed/3fnv12bdj2i2hmi' }; // alt = další názvy, které se zkusí
+        const PRESENTATION = { type: 'pdf', src: 'prezentace.pdf', alt: ['Prezentace.pdf'] }; // alt = další názvy, které se zkusí
         const PDFJS = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/';
         const slideStage = document.getElementById('slideStage');
         const slideCanvas = document.getElementById('slideCanvas');
@@ -1077,8 +1106,21 @@
         function pdfProblem(err) {
             const n = err && err.name;
             if (n === 'MissingPDFException') return slideError('Soubor nebyl nalezen (404). Zkontroluj, že se přesně takto jmenuje (velká a malá písmena, bez mezer a diakritiky) a že leží ve stejné složce jako index.html.');
-            if (n === 'InvalidPDFException') return slideError('Soubor není platné PDF.');
+            if (n === 'InvalidPDFException') return diagnosePdf();
             slideError('Prezentaci se nepodařilo zobrazit' + (err && err.message ? ' (' + err.message + ')' : '') + '.');
+        }
+        // zjistí, co ve skutečnosti leží na adrese PDF
+        function diagnosePdf() {
+            fetch(PRESENTATION.src).then(function (r) {
+                return r.arrayBuffer().then(function (buf) { return { r: r, buf: buf }; });
+            }).then(function (x) {
+                const head = new TextDecoder().decode(x.buf.slice(0, 40)).replace(/[<>&"]/g, '?');
+                const kb = Math.round(x.buf.byteLength / 1024);
+                if (!x.buf.byteLength) return slideError('Soubor je prázdný (0 B). Nahraj ho na GitHub znovu.');
+                if (head.indexOf('version https://git-lfs') === 0) return slideError('Na GitHubu je jen odkaz Git LFS, ne samotné PDF. Nahraj PDF přímo, bez LFS.');
+                if (head.indexOf('%PDF') !== 0) return slideError('Soubor (' + kb + ' kB) nezačíná jako PDF, ale takto: „' + head + '“. Pravděpodobně je to jiný formát přejmenovaný na .pdf. Ulož nebo exportuj prezentaci znovu jako PDF.');
+                nativePdf(); // hlavička je v pořádku, zkusíme zobrazení prohlížečem
+            }).catch(function () { slideError('Soubor se nepodařilo stáhnout.'); });
         }
         // když se nenačte knihovna pdf.js (blokované CDN, offline), zkusíme PDF vložit přímo
         function nativePdf() {
@@ -1198,6 +1240,30 @@
                 }
             }
 
+            // Na mobilu (úzké nebo nízké okno) se místo vlastní klávesnice použije systémová
+            const nativeInput = document.getElementById('cwInput');
+            const useNative = function () { return window.matchMedia('(max-width: 599px), (max-height: 559px)').matches; };
+            function focusNative() {
+                if (!useNative()) return;
+                nativeInput.value = ' ';
+                nativeInput.focus({ preventScroll: true });
+            }
+            nativeInput.addEventListener('input', function (e) {
+                const t = e.inputType || '';
+                if (t.indexOf('delete') === 0 || nativeInput.value === '') backspace();
+                else (e.data || nativeInput.value).split('').forEach(function (ch) {
+                    if (/^\p{L}$/u.test(ch)) typeLetter(norm(ch).toUpperCase());
+                });
+                nativeInput.value = ' ';
+            });
+
+            // výška přilepené klávesnice (kvůli odsazení obsahu a hlášek)
+            const dockEl = document.querySelector('.cw-dock');
+            new ResizeObserver(function () {
+                const fixed = getComputedStyle(dockEl).position === 'fixed';
+                document.documentElement.style.setProperty('--cwdock', (fixed ? dockEl.offsetHeight : 0) + 'px');
+            }).observe(dockEl);
+
             const cur = { w: order[0], i: 0 };
             const curKey = function () { return words[cur.w].cells[cur.i]; };
             function draw(cell) {
@@ -1214,7 +1280,7 @@
                 document.getElementById('cwClue').textContent = w.num + (w.dir === 'A' ? ' → ' : ' ↓ ') + w.clue + ' (' + w.ans.length + ')';
                 document.querySelectorAll('.cw-clue-item').forEach(function (b) { b.classList.toggle('on', +b.dataset.w === cur.w); });
             }
-            function setCur(w, i) { cur.w = w; cur.i = i; paint(); }
+            function setCur(w, i) { cur.w = w; cur.i = i; paint(); focusNative(); }
             function tapCell(k) {
                 const cell = cells[k];
                 if (k === curKey() && cell.words.length > 1) {
@@ -1268,7 +1334,7 @@
                 keys.appendChild(d);
             });
             document.addEventListener('keydown', function (e) {
-                if (currentView !== 'krizovka' || e.ctrlKey || e.metaKey || e.altKey) return;
+                if (currentView !== 'krizovka' || e.ctrlKey || e.metaKey || e.altKey || e.target === nativeInput) return;
                 if (e.key === 'Backspace') { e.preventDefault(); backspace(); }
                 else if (/^\p{L}$/u.test(e.key)) typeLetter(norm(e.key).toUpperCase());
                 else if (e.key === 'ArrowRight' || e.key === 'ArrowDown') { cur.i = Math.min(cur.i + 1, words[cur.w].cells.length - 1); paint(); }
