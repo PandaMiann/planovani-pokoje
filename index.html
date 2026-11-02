@@ -1062,7 +1062,7 @@
 
         // ===== Prezentace =====
         // PDF: dej soubor vedle index.html. Gamma: { type: 'gamma', src: 'https://gamma.app/embed/…' }
-        const PRESENTATION = { type: 'pdf', src: 'prezentace.pdf' };
+        const PRESENTATION = { type: 'pdf', src: 'prezentace.pdf', alt: ['Prezentace.pdf'] }; // alt = další názvy, které se zkusí
         const PDFJS = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/';
         const slideStage = document.getElementById('slideStage');
         const slideCanvas = document.getElementById('slideCanvas');
@@ -1070,9 +1070,20 @@
         const slideCount = document.getElementById('slideCount');
         let slidesStarted = false, pdfDoc = null, pageNum = 1, rendering = false, pendingPage = null;
 
-        function slideError() {
+        function slideError(why) {
             slideMsg.classList.remove('hidden');
-            slideMsg.innerHTML = 'Prezentaci se nepodařilo načíst. Zkontroluj, že je soubor <strong>' + PRESENTATION.src + '</strong> ve stejné složce jako index.html.';
+            slideMsg.innerHTML = why + '<br><span class="text-sm">Hledaný soubor: <strong>' + PRESENTATION.src + '</strong></span>';
+        }
+        function pdfProblem(err) {
+            const n = err && err.name;
+            if (n === 'MissingPDFException') return slideError('Soubor nebyl nalezen (404). Zkontroluj, že se přesně takto jmenuje (velká a malá písmena, bez mezer a diakritiky) a že leží ve stejné složce jako index.html.');
+            if (n === 'InvalidPDFException') return slideError('Soubor není platné PDF.');
+            slideError('Prezentaci se nepodařilo zobrazit' + (err && err.message ? ' (' + err.message + ')' : '') + '.');
+        }
+        // když se nenačte knihovna pdf.js (blokované CDN, offline), zkusíme PDF vložit přímo
+        function nativePdf() {
+            slideStage.innerHTML = '<iframe src="' + PRESENTATION.src + '" class="w-full" style="height:70vh;border:0"></iframe>';
+            ['slidePrev', 'slideNext', 'slideCount'].forEach(function (id) { document.getElementById(id).classList.add('hidden'); });
         }
         function initSlides() {
             if (slidesStarted) return;
@@ -1088,9 +1099,20 @@
             sc.src = PDFJS + 'pdf.min.js';
             sc.onload = function () {
                 pdfjsLib.GlobalWorkerOptions.workerSrc = PDFJS + 'pdf.worker.min.js';
-                pdfjsLib.getDocument(PRESENTATION.src).promise.then(function (d) { pdfDoc = d; renderPage(1); }).catch(slideError);
+                const names = [PRESENTATION.src].concat(PRESENTATION.alt || []);
+                (function tryLoad(i) {
+                    pdfjsLib.getDocument(names[i]).promise.then(function (d) {
+                        pdfDoc = d;
+                        PRESENTATION.src = names[i];
+                        document.getElementById('slideOpen').href = names[i];
+                        renderPage(1);
+                    }).catch(function (e) {
+                        if (e && e.name === 'MissingPDFException' && i + 1 < names.length) return tryLoad(i + 1);
+                        pdfProblem(e);
+                    });
+                })(0);
             };
-            sc.onerror = slideError;
+            sc.onerror = nativePdf;
             document.head.appendChild(sc);
         }
         function renderPage(n) {
@@ -1111,7 +1133,7 @@
                 slideMsg.classList.add('hidden');
                 slideCount.textContent = pageNum + ' / ' + pdfDoc.numPages;
                 if (pendingPage) { const q = pendingPage; pendingPage = null; renderPage(q); }
-            }).catch(function () { rendering = false; slideError(); });
+            }).catch(function (e) { rendering = false; pdfProblem(e); });
         }
         function slideGo(d) {
             if (!pdfDoc) return;
