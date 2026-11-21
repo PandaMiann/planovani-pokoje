@@ -8,10 +8,9 @@
     <!-- Google Fonts for a playful, readable typography -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
-    <link rel="icon" type="image/svg+xml" sizes="any"        href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏠</text></svg>"/>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/svg+xml" sizes="any" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏠</text></svg>"/>
 
-    
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
@@ -74,8 +73,8 @@
             opacity: 0;
             transform: translate(-50%, 160%);
             transition: transform .5s cubic-bezier(.22, 1, .36, 1), opacity .35s ease;
+            white-space: pre-line;
         }
-        #toast { white-space: pre-line; }
         #gradePanel {
             bottom: calc(1.5rem + env(safe-area-inset-bottom, 0px));
             width: min(92vw, 24rem);
@@ -197,6 +196,82 @@
             -ms-overflow-style: none;
             scrollbar-width: none;
         }
+
+        /* =========================================================
+           STYLY INTERAKTIVNÍ PREZENTACE (zapouzdřené prefixem pres-)
+           ========================================================= */
+        .pres-slide {
+            display: none;
+            animation: presSlideIn 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .pres-slide.pres-active {
+            display: flex;
+        }
+        @keyframes presSlideIn {
+            from { opacity: 0; transform: translateY(10px) scale(0.99); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        @keyframes presFloatSlow {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-7px); }
+        }
+        .pres-float { animation: presFloatSlow 4s ease-in-out infinite; }
+        .pres-float-delayed { animation: presFloatSlow 4.5s ease-in-out 1.2s infinite; }
+
+        /* 3D otočné karty (Slide 3) */
+        .pres-flip-card {
+            perspective: 1000px;
+            cursor: pointer;
+        }
+        .pres-flip-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            min-height: 165px;
+            transition: transform 0.55s cubic-bezier(0.4, 0.2, 0.2, 1);
+            transform-style: preserve-3d;
+        }
+        .pres-flip-card.pres-flipped .pres-flip-inner {
+            transform: rotateY(180deg);
+        }
+        .pres-flip-front, .pres-flip-back {
+            position: absolute;
+            inset: 0;
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+            border-radius: 1.25rem;
+        }
+        .pres-flip-back {
+            transform: rotateY(180deg);
+        }
+
+        /* Animace toku proudu (Slide 5) */
+        @keyframes presCurrentFlow {
+            from { stroke-dashoffset: 24; }
+            to { stroke-dashoffset: 0; }
+        }
+        .pres-wire-active {
+            stroke-dasharray: 8 4;
+            animation: presCurrentFlow 0.7s linear infinite;
+        }
+        .pres-svg-fade {
+            transition: opacity 0.45s ease;
+        }
+
+        /* Fullscreen úprava pro prezentaci */
+        #presApp:fullscreen {
+            border-radius: 0;
+            max-width: none;
+            width: 100vw;
+            height: 100vh;
+            background: #ffffff;
+            display: flex;
+            flex-direction: column;
+        }
+        #presApp:fullscreen #presSlidesContainer {
+            flex: 1;
+            overflow-y: auto;
+        }
     </style>
 </head>
 <body class="text-slate-700 antialiased font-sans">
@@ -212,9 +287,9 @@
     <nav id="viewBar" aria-label="Přepínání obsahu" class="max-w-7xl mx-auto px-4 mb-8 scroll-mt-2">
         <div class="flex gap-3 overflow-x-auto no-scrollbar p-2 bg-white rounded-3xl shadow-md border border-slate-100">
             <button type="button" data-view="prezentace" aria-pressed="false" class="view-btn ml-auto flex items-center gap-2 whitespace-nowrap rounded-2xl px-6 py-4 min-h-[56px] text-lg font-bold text-slate-600 bg-slate-50 hover:bg-indigo-50 transition">📊 Prezentace</button>
-            <button type="button" data-view="zadani" aria-pressed="false" class="view-btn  flex items-center gap-2 whitespace-nowrap rounded-2xl px-6 py-4 min-h-[56px] text-lg font-bold text-slate-600 bg-slate-50 hover:bg-indigo-50 transition">📝 Zadání</button>
-            <button type="button" data-view="video" aria-pressed="false" class="view-btn  flex items-center gap-2 whitespace-nowrap rounded-2xl px-6 py-4 min-h-[56px] text-lg font-bold text-slate-600 bg-slate-50 hover:bg-indigo-50 transition">🎬 Video</button>
-            <button type="button" data-view="shrnuti" aria-pressed="false" class="view-btn  flex items-center gap-2 whitespace-nowrap rounded-2xl px-6 py-4 min-h-[56px] text-lg font-bold text-slate-600 bg-slate-50 hover:bg-indigo-50 transition">🧠 Shrnutí</button>
+            <button type="button" data-view="zadani" aria-pressed="false" class="view-btn flex items-center gap-2 whitespace-nowrap rounded-2xl px-6 py-4 min-h-[56px] text-lg font-bold text-slate-600 bg-slate-50 hover:bg-indigo-50 transition">📝 Zadání</button>
+            <button type="button" data-view="video" aria-pressed="false" class="view-btn flex items-center gap-2 whitespace-nowrap rounded-2xl px-6 py-4 min-h-[56px] text-lg font-bold text-slate-600 bg-slate-50 hover:bg-indigo-50 transition">🎬 Video</button>
+            <button type="button" data-view="shrnuti" aria-pressed="false" class="view-btn flex items-center gap-2 whitespace-nowrap rounded-2xl px-6 py-4 min-h-[56px] text-lg font-bold text-slate-600 bg-slate-50 hover:bg-indigo-50 transition">🧠 Shrnutí</button>
             <button type="button" data-view="krizovka" aria-pressed="false" class="view-btn mr-auto flex items-center gap-2 whitespace-nowrap rounded-2xl px-6 py-4 min-h-[56px] text-lg font-bold text-slate-600 bg-slate-50 hover:bg-indigo-50 transition">🧩 Křížovka</button>
         </div>
     </nav>
@@ -402,7 +477,7 @@
 
                         <div class="bg-blue-50 border border-blue-200 rounded-2xl p-5 mb-6">
                             <p class="font-bold text-blue-900 mb-1">Co hledat? Anglické názvy:</p>
-                            <p class="text-base text-slate-600 mb-3">Záložka v menu: <strong>Doors & windows</strong></p>
+                            <p class="text-base text-slate-600 mb-3">Záložka v menu: <strong>Doors &amp; windows</strong></p>
                             <ul class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-lg text-slate-700">
                                 <li>🪟 okno: <strong>Window</strong></li>
                             </ul>
@@ -410,7 +485,7 @@
                         
                         <div class="mb-8">
                             <h4 class="text-xl font-bold text-blue-900 mb-3 bg-blue-50 py-2 px-4 rounded-lg inline-block">Krok 1: Přidání okna</h4>
-                            <p class="text-lg text-slate-700 mb-4">V levém menu najdi kategorii <strong>Doors & windows</strong> a vyber okno. Přetáhni ho na zeď místnosti.</p>
+                            <p class="text-lg text-slate-700 mb-4">V levém menu najdi kategorii <strong>Doors &amp; windows</strong> a vyber okno. Přetáhni ho na zeď místnosti.</p>
                             
                             <img src="images/okno1.png" alt="Výběr okna" class="rounded-xl shadow-md border border-slate-100 max-w-full h-auto mt-2">
                         </div>
@@ -432,7 +507,7 @@
 
                         <div class="bg-amber-50 border border-amber-200 rounded-2xl p-5 mb-6">
                             <p class="font-bold text-amber-900 mb-1">Co hledat? Anglické názvy:</p>
-                            <p class="text-base text-slate-600 mb-3">Záložka v menu: <strong>Doors & windows</strong></p>
+                            <p class="text-base text-slate-600 mb-3">Záložka v menu: <strong>Doors &amp; windows</strong></p>
                             <ul class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-lg text-slate-700">
                                 <li>🚪 dveře: <strong>Door</strong></li>
                             </ul>
@@ -440,7 +515,7 @@
                         
                         <div class="mb-8">
                             <h4 class="text-xl font-bold text-amber-900 mb-3 bg-amber-50 py-2 px-4 rounded-lg inline-block">Krok 1: Přidání dveří</h4>
-                            <p class="text-lg text-slate-700 mb-4">Podobně jako okno, v sekci <strong>Doors & windows</strong> vyber dveře a umísti je na zeď.</p>
+                            <p class="text-lg text-slate-700 mb-4">Podobně jako okno, v sekci <strong>Doors &amp; windows</strong> vyber dveře a umísti je na zeď.</p>
                             
                             <img src="images/dvere1.png" alt="Výběr dveří" class="rounded-xl shadow-md border border-slate-100 max-w-full h-auto mt-2">
                         </div>
@@ -570,7 +645,6 @@
                             Odevzdání
                         </h3>
 
-                        
                         <div class="mb-8">
                             <h4 class="text-xl font-bold text-emerald-900 mb-3 bg-emerald-50 py-2 px-4 rounded-lg inline-block">Krok 1: Print screen 2D modelu</h4>
                             <p class="text-lg text-slate-700 mb-4">Udělej snímek obrazovky (print screen) svého hotového pokoje, jak vypadá z vrchního pohledu.</p>
@@ -600,20 +674,866 @@
         </section>
         </div>
 
-        <!-- PREZENTACE -->
+        <!-- ========================================================= -->
+        <!-- PREZENTACE (NATIVNĚ VLOŽENÁ INTERAKTIVNÍ PREZENTACE)      -->
+        <!-- ========================================================= -->
         <div id="view-prezentace" class="hidden">
-            <section class="bg-white rounded-[2rem] shadow-xl border-t-8 border-indigo-300 p-4 md:p-8 mb-16">
-                <h3 class="text-2xl md:text-3xl font-bold text-slate-800 mb-4">📊 Modely a schémata</h3>
-                <div id="slideStage" class="relative bg-slate-100 rounded-2xl overflow-hidden flex items-center justify-center min-h-[240px]" style="touch-action: pan-y;">
-                    <canvas id="slideCanvas"></canvas>
-                    <p id="slideMsg" class="absolute text-slate-500 text-lg px-4 text-center">Načítám prezentaci…</p>
+            <section id="presApp" class="bg-white rounded-[2rem] shadow-xl border-t-8 border-indigo-400 overflow-hidden mb-16 flex flex-col">
+                
+                <!-- Horní lišta prezentace -->
+                <div class="px-4 sm:px-6 pt-4 pb-3 bg-white border-b border-slate-100 flex flex-col gap-3 shrink-0">
+                    <div class="flex flex-wrap items-center justify-between gap-2">
+                        <div class="flex items-center gap-2.5 min-w-0">
+                            <span class="w-9 h-9 rounded-xl bg-indigo-100 text-indigo-700 flex items-center justify-center font-black text-lg shrink-0">📊</span>
+                            <div class="min-w-0">
+                                <h3 class="font-extrabold text-slate-800 text-base sm:text-lg truncate leading-tight">Modely a schémata</h3>
+                                <p class="text-xs font-bold text-slate-400 hidden sm:block">Interaktivní prezentace • 7. třída</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center gap-2">
+                            <!-- Rozbalovací seznam slajdů -->
+                            <div class="relative">
+                                <button id="presMenuBtn" type="button" class="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold bg-slate-100 hover:bg-slate-200 text-slate-700 transition flex items-center gap-1.5" aria-label="Přehled slajdů">
+                                    <span>📑</span>
+                                    <span class="hidden sm:inline">Obsah</span>
+                                </button>
+                                <div id="presMenuDropdown" class="hidden absolute right-0 mt-2 w-64 bg-white rounded-2xl shadow-2xl border border-slate-200 p-2 z-50">
+                                    <div class="text-xs font-extrabold uppercase tracking-wider text-slate-400 px-3 py-1.5">Přejít na slide</div>
+                                    <div id="presMenuList" class="flex flex-col gap-1"></div>
+                                </div>
+                            </div>
+
+                            <!-- Tlačítko Fullscreen -->
+                            <button id="presFullBtn" type="button" class="px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold bg-indigo-50 hover:bg-indigo-100 text-indigo-700 transition flex items-center gap-1.5" title="Na celou obrazovku" aria-label="Přepnout celou obrazovku">
+                                <span>⛶</span>
+                                <span id="presFullText" class="hidden sm:inline">Celá obrazovka</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Progress bar -->
+                    <div class="w-full h-2.5 bg-slate-100 rounded-full overflow-hidden">
+                        <div id="presProgressBar" class="h-full bg-gradient-to-r from-indigo-400 via-purple-400 to-emerald-400 rounded-full transition-all duration-300" style="width: 12.5%;"></div>
+                    </div>
                 </div>
-                <div id="slideNav" class="mt-4 flex items-center justify-center gap-3">
-                    <button type="button" id="slidePrev" aria-label="Předchozí" class="h-14 w-14 rounded-2xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-3xl font-bold">‹</button>
-                    <span id="slideCount" class="min-w-[5rem] text-center text-lg font-bold text-slate-600">– / –</span>
-                    <button type="button" id="slideNext" aria-label="Další" class="h-14 w-14 rounded-2xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-3xl font-bold">›</button>
-                    <button type="button" id="slideFull" aria-label="Na celou obrazovku" class="hidden h-14 px-4 rounded-2xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xl font-bold">⛶</button>
-                    <a id="slideOpen" target="_blank" rel="noopener noreferrer" class="h-14 px-4 rounded-2xl bg-slate-50 hover:bg-slate-100 text-slate-600 font-bold flex items-center">Otevřít PDF ↗</a>
+
+                <!-- Plocha pro slidy -->
+                <div id="presSlidesContainer" class="p-4 sm:p-6 md:p-8 min-h-[520px] flex flex-col justify-center" style="touch-action: pan-y;">
+
+                    <!-- SLIDE 1: ÚVODNÍ SLIDE -->
+                    <div class="pres-slide pres-active flex-col justify-center items-center w-full" data-pres-title="1. Úvodní slide">
+                        <div class="w-full grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+                            <div class="lg:col-span-7 text-center lg:text-left space-y-5">
+                                <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-indigo-100 text-indigo-800 font-extrabold text-xs sm:text-sm tracking-wide shadow-sm">
+                                    <span>💻</span>
+                                    <span>INFORMATIKA • 7. TŘÍDA • DAMIÁN KOŘALKA</span>
+                                </div>
+
+                                <h2 class="text-4xl sm:text-5xl font-black text-slate-900 leading-tight tracking-tight">
+                                    Modely a <span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-purple-600">schémata</span>
+                                </h2>
+
+                                <p class="text-lg sm:text-xl md:text-2xl text-slate-600 font-semibold max-w-2xl mx-auto lg:mx-0 leading-relaxed">
+                                    Jak pomocí zjednodušení lépe porozumět světu kolem nás
+                                </p>
+
+                                <div class="pt-2 flex flex-wrap items-center justify-center lg:justify-start gap-3">
+                                    <button type="button" onclick="presGoTo(1)" class="px-7 py-3.5 rounded-2xl bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white font-extrabold text-lg shadow-lg shadow-indigo-200 transition transform hover:-translate-y-0.5 active:translate-y-0">
+                                        Spustit prezentaci →
+                                    </button>
+                                    <span class="text-xs sm:text-sm font-bold text-slate-400 px-2">Tip: Ovládej i šipkami ⬅️ ➡️</span>
+                                </div>
+                            </div>
+
+                            <div class="lg:col-span-5 flex justify-center">
+                                <div class="w-full max-w-sm sm:max-w-md bg-gradient-to-br from-sky-50 via-purple-50 to-emerald-50 rounded-3xl p-5 border border-slate-100 shadow-inner">
+                                    <svg viewBox="0 0 360 280" class="w-full h-auto" aria-label="Ilustrace modelů a schémat">
+                                        <circle cx="180" cy="145" r="105" fill="#E0F2FE" opacity="0.65" />
+                                        <circle cx="265" cy="70" r="38" fill="#F3E8FF" opacity="0.9" />
+                                        <circle cx="80" cy="215" r="30" fill="#DCFCE7" opacity="0.9" />
+                                        <g class="pres-float">
+                                            <rect x="34" y="34" width="132" height="96" rx="18" fill="#FFFFFF" stroke="#BAE6FD" stroke-width="2.5" />
+                                            <circle cx="80" cy="82" r="28" fill="#E0F2FE" />
+                                            <path d="M80 82 L80 54 A28 28 0 0 1 106 92 Z" fill="#38BDF8" />
+                                            <path d="M80 82 L106 92 A28 28 0 0 1 68 107 Z" fill="#A855F7" />
+                                            <path d="M80 82 L68 107 A28 28 0 0 1 80 54 Z" fill="#34D399" />
+                                            <rect x="118" y="64" width="32" height="7" rx="3.5" fill="#CBD5E1" />
+                                            <rect x="118" y="79" width="24" height="7" rx="3.5" fill="#E2E8F0" />
+                                            <rect x="118" y="94" width="28" height="7" rx="3.5" fill="#CBD5E1" />
+                                        </g>
+                                        <g class="pres-float-delayed">
+                                            <rect x="188" y="142" width="144" height="104" rx="18" fill="#FFFFFF" stroke="#E9D5FF" stroke-width="2.5" />
+                                            <line x1="224" y1="176" x2="294" y2="176" stroke="#94A3B8" stroke-width="3" stroke-dasharray="5 4" />
+                                            <line x1="224" y1="176" x2="258" y2="218" stroke="#A855F7" stroke-width="3" />
+                                            <line x1="294" y1="176" x2="258" y2="218" stroke="#38BDF8" stroke-width="3" />
+                                            <circle cx="224" cy="176" r="13" fill="#38BDF8" />
+                                            <circle cx="294" cy="176" r="13" fill="#34D399" />
+                                            <circle cx="258" cy="218" r="15" fill="#A855F7" />
+                                            <circle cx="224" cy="176" r="5" fill="#FFFFFF" />
+                                            <circle cx="294" cy="176" r="5" fill="#FFFFFF" />
+                                            <circle cx="258" cy="218" r="6" fill="#FFFFFF" />
+                                        </g>
+                                        <g transform="translate(135, 92)">
+                                            <line x1="66" y1="66" x2="105" y2="105" stroke="#475569" stroke-width="14" stroke-linecap="round" />
+                                            <line x1="66" y1="66" x2="105" y2="105" stroke="#64748B" stroke-width="6" stroke-linecap="round" />
+                                            <circle cx="40" cy="40" r="38" fill="#FFFFFF" fill-opacity="0.78" stroke="#6366F1" stroke-width="7" />
+                                            <rect x="23" y="42" width="8" height="14" rx="3" fill="#38BDF8" />
+                                            <rect x="36" y="32" width="8" height="24" rx="3" fill="#A855F7" />
+                                            <rect x="49" y="22" width="8" height="34" rx="3" fill="#10B981" />
+                                        </g>
+                                    </svg>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SLIDE 2: CO JE MODEL? -->
+                    <div class="pres-slide flex-col gap-5 w-full" data-pres-title="2. Co je model?">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                            <h2 class="text-3xl sm:text-4xl font-black text-slate-900">🧩 Co je model?</h2>
+                            <span class="text-xs sm:text-sm font-bold text-slate-500">Klikni na karty a vyzkoušej přepínač vpravo</span>
+                        </div>
+
+                        <div class="p-4 sm:p-5 rounded-2xl bg-sky-50 border-2 border-sky-200 text-sky-950 text-lg sm:text-2xl font-extrabold text-center shadow-sm">
+                            „Model je zjednodušené znázornění něčeho.“
+                        </div>
+
+                        <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch">
+                            <div class="lg:col-span-6 flex flex-col gap-3 justify-between">
+                                <button type="button" onclick="presToggleTrait(this)" class="text-left p-4 rounded-2xl bg-white border-2 border-slate-200 hover:border-sky-300 transition shadow-sm">
+                                    <div class="flex items-center justify-between gap-3">
+                                        <div class="flex items-center gap-3">
+                                            <span class="w-10 h-10 rounded-xl bg-sky-100 text-sky-700 flex items-center justify-center text-xl shrink-0">🌍</span>
+                                            <span class="font-extrabold text-base sm:text-lg text-slate-800">Znázorňuje něco skutečného</span>
+                                        </div>
+                                        <span class="pres-trait-arrow text-slate-400 font-black">＋</span>
+                                    </div>
+                                    <p class="pres-trait-detail hidden mt-2.5 text-slate-600 font-semibold text-sm sm:text-base bg-sky-50/70 p-2.5 rounded-xl">
+                                        Model vychází z reálného světa.
+                                    </p>
+                                </button>
+
+                                <button type="button" onclick="presToggleTrait(this)" class="text-left p-4 rounded-2xl bg-white border-2 border-slate-200 hover:border-purple-300 transition shadow-sm">
+                                    <div class="flex items-center justify-between gap-3">
+                                        <div class="flex items-center gap-3">
+                                            <span class="w-10 h-10 rounded-xl bg-purple-100 text-purple-700 flex items-center justify-center text-xl shrink-0">🧱</span>
+                                            <span class="font-extrabold text-base sm:text-lg text-slate-800">Může být hmatatelný nebo digitální</span>
+                                        </div>
+                                        <span class="pres-trait-arrow text-slate-400 font-black">＋</span>
+                                    </div>
+                                    <p class="pres-trait-detail hidden mt-2.5 text-slate-600 font-semibold text-sm sm:text-base bg-purple-50/70 p-2.5 rounded-xl">
+                                        Fyzický model i počítačová aplikace.
+                                    </p>
+                                </button>
+
+                                <button type="button" onclick="presToggleTrait(this)" class="text-left p-4 rounded-2xl bg-white border-2 border-slate-200 hover:border-emerald-300 transition shadow-sm">
+                                    <div class="flex items-center justify-between gap-3">
+                                        <div class="flex items-center gap-3">
+                                            <span class="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center text-xl shrink-0">🎯</span>
+                                            <span class="font-extrabold text-base sm:text-lg text-slate-800">Obsahuje pouze důležité informace</span>
+                                        </div>
+                                        <span class="pres-trait-arrow text-slate-400 font-black">＋</span>
+                                    </div>
+                                    <p class="pres-trait-detail hidden mt-2.5 text-slate-600 font-semibold text-sm sm:text-base bg-emerald-50/70 p-2.5 rounded-xl">
+                                        Záměrně vynechává detaily pro srozumitelnost.
+                                    </p>
+                                </button>
+                            </div>
+
+                            <!-- Interaktivní SVG přepínač město ↔ mapa -->
+                            <div class="lg:col-span-6 bg-slate-50 rounded-3xl border border-slate-200 p-4 flex flex-col justify-between gap-3">
+                                <div class="flex flex-wrap items-center justify-between gap-2">
+                                    <span id="presCityBadge" class="px-3 py-1 rounded-full text-xs sm:text-sm font-extrabold bg-amber-100 text-amber-800">
+                                        🏙️ Složité město (realita)
+                                    </span>
+                                    <div class="inline-flex bg-white p-1 rounded-xl border border-slate-200 shadow-sm">
+                                        <button id="presBtnCityReal" type="button" onclick="presSetCityMode('real')" class="px-3 py-1.5 rounded-lg text-xs sm:text-sm font-extrabold bg-indigo-500 text-white transition">Realita</button>
+                                        <button id="presBtnCityModel" type="button" onclick="presSetCityMode('model')" class="px-3 py-1.5 rounded-lg text-xs sm:text-sm font-extrabold text-slate-600 hover:bg-slate-100 transition">Model (mapa)</button>
+                                    </div>
+                                </div>
+
+                                <div class="w-full bg-white rounded-2xl border border-slate-200 overflow-hidden">
+                                    <svg viewBox="0 0 420 220" class="w-full h-auto block" aria-label="Porovnání složitého města a zjednodušené mapy">
+                                        <rect width="420" height="220" fill="#F8FAFC" />
+                                        <g id="presSvgCityReality" class="pres-svg-fade" opacity="1">
+                                            <rect x="0" y="95" width="420" height="26" fill="#CBD5E1" />
+                                            <rect x="195" y="0" width="26" height="220" fill="#CBD5E1" />
+                                            <line x1="0" y1="108" x2="420" y2="108" stroke="#FFFFFF" stroke-width="2" stroke-dasharray="10 8" />
+                                            <line x1="208" y1="0" x2="208" y2="220" stroke="#FFFFFF" stroke-width="2" stroke-dasharray="10 8" />
+                                            <rect x="20" y="135" width="155" height="70" rx="10" fill="#BBF7D0" />
+                                            <circle cx="50" cy="160" r="14" fill="#22C55E" />
+                                            <circle cx="85" cy="180" r="12" fill="#16A34A" />
+                                            <circle cx="135" cy="158" r="16" fill="#22C55E" />
+                                            <circle cx="155" cy="184" r="10" fill="#15803D" />
+                                            <rect x="25" y="18" width="60" height="65" rx="6" fill="#94A3B8" />
+                                            <rect x="35" y="28" width="12" height="12" fill="#E0F2FE" />
+                                            <rect x="60" y="28" width="12" height="12" fill="#E0F2FE" />
+                                            <rect x="35" y="48" width="12" height="12" fill="#E0F2FE" />
+                                            <rect x="60" y="48" width="12" height="12" fill="#FEF08A" />
+                                            <rect x="100" y="30" width="75" height="53" rx="6" fill="#64748B" />
+                                            <rect x="112" y="42" width="14" height="14" fill="#E0F2FE" />
+                                            <rect x="135" y="42" width="14" height="14" fill="#FEF08A" />
+                                            <rect x="155" y="42" width="12" height="14" fill="#E0F2FE" />
+                                            <rect x="240" y="14" width="68" height="70" rx="6" fill="#94A3B8" />
+                                            <rect x="252" y="24" width="14" height="12" fill="#FFFFFF" />
+                                            <rect x="280" y="24" width="14" height="12" fill="#FFFFFF" />
+                                            <rect x="252" y="46" width="14" height="12" fill="#FEF08A" />
+                                            <rect x="280" y="46" width="14" height="12" fill="#FFFFFF" />
+                                            <rect x="325" y="26" width="75" height="58" rx="6" fill="#475569" />
+                                            <rect x="336" y="38" width="12" height="14" fill="#E0F2FE" />
+                                            <rect x="356" y="38" width="12" height="14" fill="#E0F2FE" />
+                                            <rect x="376" y="38" width="12" height="14" fill="#FEF08A" />
+                                            <rect x="245" y="138" width="150" height="65" rx="8" fill="#94A3B8" />
+                                            <rect x="260" y="150" width="22" height="16" fill="#E0F2FE" />
+                                            <rect x="295" y="150" width="22" height="16" fill="#E0F2FE" />
+                                            <rect x="330" y="150" width="22" height="16" fill="#FEF08A" />
+                                            <rect x="365" y="150" width="18" height="16" fill="#E0F2FE" />
+                                            <rect x="120" y="100" width="20" height="10" rx="3" fill="#EF4444" />
+                                            <rect x="285" y="106" width="20" height="10" rx="3" fill="#3B82F6" />
+                                        </g>
+                                        <g id="presSvgCityModel" class="pres-svg-fade" opacity="0" style="pointer-events: none;">
+                                            <rect x="25" y="20" width="150" height="62" rx="12" fill="#EFF6FF" stroke="#BFDBFE" stroke-width="2" />
+                                            <rect x="242" y="20" width="153" height="62" rx="12" fill="#F5F3FF" stroke="#DDD6FE" stroke-width="2" />
+                                            <rect x="25" y="136" width="150" height="65" rx="12" fill="#ECFDF5" stroke="#A7F3D0" stroke-width="2" />
+                                            <rect x="242" y="136" width="153" height="65" rx="12" fill="#EFF6FF" stroke="#BFDBFE" stroke-width="2" />
+                                            <line x1="25" y1="108" x2="395" y2="108" stroke="#38BDF8" stroke-width="8" stroke-linecap="round" />
+                                            <line x1="208" y1="18" x2="208" y2="202" stroke="#A855F7" stroke-width="8" stroke-linecap="round" />
+                                            <circle cx="80" cy="108" r="10" fill="#FFFFFF" stroke="#0284C7" stroke-width="4" />
+                                            <circle cx="335" cy="108" r="10" fill="#FFFFFF" stroke="#0284C7" stroke-width="4" />
+                                            <circle cx="208" cy="48" r="10" fill="#FFFFFF" stroke="#7E22CE" stroke-width="4" />
+                                            <circle cx="208" cy="170" r="10" fill="#FFFFFF" stroke="#7E22CE" stroke-width="4" />
+                                            <circle cx="208" cy="108" r="15" fill="#A855F7" stroke="#FFFFFF" stroke-width="4" />
+                                            <text x="100" y="56" text-anchor="middle" fill="#1E40AF" font-size="13" font-weight="800">ŠKOLA</text>
+                                            <text x="318" y="56" text-anchor="middle" fill="#6B21A8" font-size="13" font-weight="800">NÁDRAŽÍ</text>
+                                            <text x="100" y="173" text-anchor="middle" fill="#065F46" font-size="13" font-weight="800">PARK</text>
+                                            <text x="318" y="173" text-anchor="middle" fill="#1E40AF" font-size="13" font-weight="800">CENTRUM</text>
+                                        </g>
+                                    </svg>
+                                </div>
+
+                                <p id="presCityDesc" class="text-xs sm:text-sm font-bold text-slate-600 text-center">
+                                    V realitě vidíme stovky detailů: okna, auta, stromy i barvy budov. Přepni na <strong>Model (mapa)</strong>!
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SLIDE 3: PROČ MODELY POUŽÍVÁME? -->
+                    <div class="pres-slide flex-col gap-5 w-full" data-pres-title="3. Proč modely používáme?">
+                        <div class="flex flex-wrap items-center justify-between gap-3">
+                            <div>
+                                <h2 class="text-3xl sm:text-4xl font-black text-slate-900">❓ Proč modely používáme?</h2>
+                                <p class="text-slate-600 font-bold text-base sm:text-lg mt-1">
+                                    Skutečnost může být složitá. Model nám umožní zaměřit se na to, co právě potřebujeme.
+                                </p>
+                            </div>
+                            <button id="presRevealAllBtn" type="button" onclick="presToggleAllFlips()" class="px-4 py-2 rounded-xl bg-purple-100 hover:bg-purple-200 text-purple-800 font-extrabold text-sm transition">
+                                ✨ Odhalit vše
+                            </button>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 my-1">
+                            <div class="pres-flip-card h-44 sm:h-48" onclick="this.classList.toggle('pres-flipped'); presUpdateRevealBtn();">
+                                <div class="pres-flip-inner">
+                                    <div class="pres-flip-front bg-sky-50 border-2 border-sky-200 p-5 flex flex-col items-center justify-center text-center shadow-sm hover:shadow-md transition">
+                                        <span class="text-4xl mb-2">🏙️</span>
+                                        <span class="text-xs uppercase font-extrabold text-sky-600 tracking-wider">Skutečnost</span>
+                                        <h3 class="text-2xl font-black text-slate-800 mt-1">Město</h3>
+                                        <span class="mt-3 text-xs font-bold text-sky-700 bg-white px-3 py-1 rounded-full">Klikni pro model →</span>
+                                    </div>
+                                    <div class="pres-flip-back bg-sky-500 text-white p-5 flex flex-col items-center justify-center text-center shadow-md">
+                                        <span class="text-3xl mb-1">🗺️</span>
+                                        <div class="text-xs font-bold opacity-85 uppercase">Město → model</div>
+                                        <h3 class="text-2xl font-black mt-0.5">Mapa</h3>
+                                        <p class="mt-2 text-sm font-bold bg-white/20 px-3 py-1 rounded-xl">Orientace v ulicích</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="pres-flip-card h-44 sm:h-48" onclick="this.classList.toggle('pres-flipped'); presUpdateRevealBtn();">
+                                <div class="pres-flip-inner">
+                                    <div class="pres-flip-front bg-purple-50 border-2 border-purple-200 p-5 flex flex-col items-center justify-center text-center shadow-sm hover:shadow-md transition">
+                                        <span class="text-4xl mb-2">🚇</span>
+                                        <span class="text-xs uppercase font-extrabold text-purple-600 tracking-wider">Skutečnost</span>
+                                        <h3 class="text-2xl font-black text-slate-800 mt-1">Metro</h3>
+                                        <span class="mt-3 text-xs font-bold text-purple-700 bg-white px-3 py-1 rounded-full">Klikni pro model →</span>
+                                    </div>
+                                    <div class="pres-flip-back bg-purple-500 text-white p-5 flex flex-col items-center justify-center text-center shadow-md">
+                                        <span class="text-3xl mb-1">🛤️</span>
+                                        <div class="text-xs font-bold opacity-85 uppercase">Metro → model</div>
+                                        <h3 class="text-2xl font-black mt-0.5">Mapa metra</h3>
+                                        <p class="mt-2 text-sm font-bold bg-white/20 px-3 py-1 rounded-xl">Plánování trasy</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="pres-flip-card h-44 sm:h-48" onclick="this.classList.toggle('pres-flipped'); presUpdateRevealBtn();">
+                                <div class="pres-flip-inner">
+                                    <div class="pres-flip-front bg-amber-50 border-2 border-amber-200 p-5 flex flex-col items-center justify-center text-center shadow-sm hover:shadow-md transition">
+                                        <span class="text-4xl mb-2">⛅</span>
+                                        <span class="text-xs uppercase font-extrabold text-amber-600 tracking-wider">Skutečnost</span>
+                                        <h3 class="text-2xl font-black text-slate-800 mt-1">Počasí</h3>
+                                        <span class="mt-3 text-xs font-bold text-amber-700 bg-white px-3 py-1 rounded-full">Klikni pro model →</span>
+                                    </div>
+                                    <div class="pres-flip-back bg-amber-500 text-white p-5 flex flex-col items-center justify-center text-center shadow-md">
+                                        <span class="text-3xl mb-1">📱</span>
+                                        <div class="text-xs font-bold opacity-85 uppercase">Počasí → model</div>
+                                        <h3 class="text-2xl font-black mt-0.5">Předpověď</h3>
+                                        <p class="mt-2 text-sm font-bold bg-white/20 px-3 py-1 rounded-xl">Plánování dne</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="pres-flip-card h-44 sm:h-48" onclick="this.classList.toggle('pres-flipped'); presUpdateRevealBtn();">
+                                <div class="pres-flip-inner">
+                                    <div class="pres-flip-front bg-emerald-50 border-2 border-emerald-200 p-5 flex flex-col items-center justify-center text-center shadow-sm hover:shadow-md transition">
+                                        <span class="text-4xl mb-2">👨‍👩‍👧‍👦</span>
+                                        <span class="text-xs uppercase font-extrabold text-emerald-600 tracking-wider">Skutečnost</span>
+                                        <h3 class="text-2xl font-black text-slate-800 mt-1">Rodina</h3>
+                                        <span class="mt-3 text-xs font-bold text-emerald-700 bg-white px-3 py-1 rounded-full">Klikni pro model →</span>
+                                    </div>
+                                    <div class="pres-flip-back bg-emerald-500 text-white p-5 flex flex-col items-center justify-center text-center shadow-md">
+                                        <span class="text-3xl mb-1">🌳</span>
+                                        <div class="text-xs font-bold opacity-85 uppercase">Rodina → model</div>
+                                        <h3 class="text-2xl font-black mt-0.5">Rodokmen</h3>
+                                        <p class="mt-2 text-sm font-bold bg-white/20 px-3 py-1 rounded-xl">Přehled příbuzných</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-emerald-50 via-sky-50 to-purple-50 border border-slate-200 text-center">
+                            <p class="text-lg sm:text-xl font-black text-slate-800">
+                                💡 „Model nám pomáhá něco <span class="text-sky-600">pochopit</span>, <span class="text-purple-600">popsat</span> nebo <span class="text-emerald-600">vyřešit</span>.“
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- SLIDE 4: S MODELY SE SETKÁVÁME VŠUDE -->
+                    <div class="pres-slide flex-col gap-5 w-full" data-pres-title="4. S modely se setkáváme všude">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                            <h2 class="text-3xl sm:text-4xl font-black text-slate-900">🌍 S modely se setkáváme všude</h2>
+                            <span class="text-xs sm:text-sm font-bold text-slate-500">Klikni na libovolnou kartu</span>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                            <div onclick="presHighlightCard(this)" class="pres-example-card cursor-pointer p-5 rounded-2xl bg-sky-50/70 border-2 border-sky-100 hover:border-sky-300 hover:bg-sky-50 transition flex flex-col gap-2">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-12 h-12 rounded-2xl bg-white shadow-sm flex items-center justify-center text-2xl">🚇</div>
+                                    <h3 class="text-xl font-black text-slate-800">Mapa metra</h3>
+                                </div>
+                                <p class="text-sm sm:text-base font-semibold text-slate-600">Zobrazuje jen linky, stanice a přestupy. Skutečné vzdálenosti ani zatáčky tunelů nepotřebujeme.</p>
+                            </div>
+
+                            <div onclick="presHighlightCard(this)" class="pres-example-card cursor-pointer p-5 rounded-2xl bg-amber-50/70 border-2 border-amber-100 hover:border-amber-300 hover:bg-amber-50 transition flex flex-col gap-2">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-12 h-12 rounded-2xl bg-white shadow-sm flex items-center justify-center text-2xl">🌤️</div>
+                                    <h3 class="text-xl font-black text-slate-800">Předpověď počasí</h3>
+                                </div>
+                                <p class="text-sm sm:text-base font-semibold text-slate-600">Převede složité děje v atmosféře na jednoduché ikony, teplotu, vítr a procento srážek.</p>
+                            </div>
+
+                            <div onclick="presHighlightCard(this)" class="pres-example-card cursor-pointer p-5 rounded-2xl bg-emerald-50/70 border-2 border-emerald-100 hover:border-emerald-300 hover:bg-emerald-50 transition flex flex-col gap-2">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-12 h-12 rounded-2xl bg-white shadow-sm flex items-center justify-center text-2xl">🌳</div>
+                                    <h3 class="text-xl font-black text-slate-800">Rodokmen</h3>
+                                </div>
+                                <p class="text-sm sm:text-base font-semibold text-slate-600">Přehledně ukazuje rodinné vazby a generace – kdo je čí rodič, sourozenec nebo prarodič.</p>
+                            </div>
+
+                            <div onclick="presHighlightCard(this)" class="pres-example-card cursor-pointer p-5 rounded-2xl bg-purple-50/70 border-2 border-purple-100 hover:border-purple-300 hover:bg-purple-50 transition flex flex-col gap-2">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-12 h-12 rounded-2xl bg-white shadow-sm flex items-center justify-center text-2xl">🦴</div>
+                                    <h3 class="text-xl font-black text-slate-800">Model kostry</h3>
+                                </div>
+                                <p class="text-sm sm:text-base font-semibold text-slate-600">Fyzický model z učebny přírodopisu – vynechává kůži a svaly, abychom poznali stavbu kostí.</p>
+                            </div>
+
+                            <div onclick="presHighlightCard(this)" class="pres-example-card cursor-pointer p-5 rounded-2xl bg-rose-50/70 border-2 border-rose-100 hover:border-rose-300 hover:bg-rose-50 transition flex flex-col gap-2">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-12 h-12 rounded-2xl bg-white shadow-sm flex items-center justify-center text-2xl">🏠</div>
+                                    <h3 class="text-xl font-black text-slate-800">Půdorys domu</h3>
+                                </div>
+                                <p class="text-sm sm:text-base font-semibold text-slate-600">Pohled shora na rozložení místností, stěn, oken a dveří. Skvělý pro plánování pokoje!</p>
+                            </div>
+
+                            <div onclick="presHighlightCard(this)" class="pres-example-card cursor-pointer p-5 rounded-2xl bg-teal-50/70 border-2 border-teal-100 hover:border-teal-300 hover:bg-teal-50 transition flex flex-col gap-2">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-12 h-12 rounded-2xl bg-white shadow-sm flex items-center justify-center text-2xl">🥾</div>
+                                    <h3 class="text-xl font-black text-slate-800">Turistická mapa</h3>
+                                </div>
+                                <p class="text-sm sm:text-base font-semibold text-slate-600">Zvýrazňuje značené trasy, vrstevnice, lesy a rozhledny, abychom se na výletě neztratili.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SLIDE 5: CO JE SCHÉMA? -->
+                    <div class="pres-slide flex-col gap-5 w-full" data-pres-title="5. Co je schéma?">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                            <h2 class="text-3xl sm:text-4xl font-black text-slate-900">🔀 Co je schéma?</h2>
+                            <span class="text-xs sm:text-sm font-bold text-slate-500">Vyzkoušej kliknout na vypínač ve schématu!</span>
+                        </div>
+
+                        <div class="p-4 sm:p-5 rounded-2xl bg-purple-50 border-2 border-purple-200 text-purple-950 text-lg sm:text-2xl font-extrabold text-center shadow-sm">
+                            „Schéma je zjednodušené grafické znázornění vztahů, struktury nebo postupu.“
+                        </div>
+
+                        <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch">
+                            <div class="lg:col-span-5 flex flex-col gap-3 justify-between">
+                                <button type="button" onclick="presToggleTrait(this)" class="text-left p-4 rounded-2xl bg-white border-2 border-slate-200 hover:border-purple-300 transition shadow-sm">
+                                    <div class="flex items-center justify-between gap-3">
+                                        <div class="flex items-center gap-3">
+                                            <span class="w-10 h-10 rounded-xl bg-purple-100 text-purple-700 flex items-center justify-center text-xl shrink-0">➡️</span>
+                                            <span class="font-extrabold text-base sm:text-lg text-slate-800">Používá symboly a šipky</span>
+                                        </div>
+                                        <span class="pres-trait-arrow text-slate-400 font-black">＋</span>
+                                    </div>
+                                    <p class="pres-trait-detail hidden mt-2.5 text-slate-600 font-semibold text-sm sm:text-base bg-purple-50/70 p-2.5 rounded-xl">
+                                        Čáry, tvary a značky nahrazují slova.
+                                    </p>
+                                </button>
+
+                                <button type="button" onclick="presToggleTrait(this)" class="text-left p-4 rounded-2xl bg-white border-2 border-slate-200 hover:border-sky-300 transition shadow-sm">
+                                    <div class="flex items-center justify-between gap-3">
+                                        <div class="flex items-center gap-3">
+                                            <span class="w-10 h-10 rounded-xl bg-sky-100 text-sky-700 flex items-center justify-center text-xl shrink-0">🔗</span>
+                                            <span class="font-extrabold text-base sm:text-lg text-slate-800">Rychle ukáže souvislosti</span>
+                                        </div>
+                                        <span class="pres-trait-arrow text-slate-400 font-black">＋</span>
+                                    </div>
+                                    <p class="pres-trait-detail hidden mt-2.5 text-slate-600 font-semibold text-sm sm:text-base bg-sky-50/70 p-2.5 rounded-xl">
+                                        Na první pohled vidíme, co s čím souvisí.
+                                    </p>
+                                </button>
+
+                                <button type="button" onclick="presToggleTrait(this)" class="text-left p-4 rounded-2xl bg-white border-2 border-slate-200 hover:border-emerald-300 transition shadow-sm">
+                                    <div class="flex items-center justify-between gap-3">
+                                        <div class="flex items-center gap-3">
+                                            <span class="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center text-xl shrink-0">🎨</span>
+                                            <span class="font-extrabold text-base sm:text-lg text-slate-800">Neřeší realistický vzhled</span>
+                                        </div>
+                                        <span class="pres-trait-arrow text-slate-400 font-black">＋</span>
+                                    </div>
+                                    <p class="pres-trait-detail hidden mt-2.5 text-slate-600 font-semibold text-sm sm:text-base bg-emerald-50/70 p-2.5 rounded-xl">
+                                        Důležitý je obsah, ne podoba.
+                                    </p>
+                                </button>
+                            </div>
+
+                            <!-- Interaktivní SVG schéma osvětlení místnosti -->
+                            <div class="lg:col-span-7 bg-slate-50 rounded-3xl border border-slate-200 p-4 flex flex-col justify-between gap-3">
+                                <div class="flex items-center justify-between gap-2">
+                                    <span class="font-extrabold text-slate-700 text-sm sm:text-base">⚡ Interaktivní schéma: Osvětlení místnosti</span>
+                                    <button id="presSwitchBtn" type="button" onclick="presToggleCircuit()" class="px-4 py-1.5 rounded-xl font-extrabold text-xs sm:text-sm bg-slate-200 hover:bg-slate-300 text-slate-800 transition">
+                                        🔌 Zapnout vypínač
+                                    </button>
+                                </div>
+
+                                <div class="bg-white rounded-2xl border border-slate-200 p-2">
+                                    <svg viewBox="0 0 460 215" class="w-full h-auto block" aria-label="Interaktivní schéma zapojení žárovky">
+                                        <rect x="18" y="15" width="424" height="185" rx="14" fill="#F8FAFC" stroke="#CBD5E1" stroke-width="2.5" stroke-dasharray="6 4" />
+                                        <text x="34" y="38" fill="#94A3B8" font-size="12" font-weight="800">POKOJ – SCHÉMA ZAPOJENÍ</text>
+                                        <path id="presWireHot1" d="M 85 150 L 85 95 L 185 95" fill="none" stroke="#EF4444" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" />
+                                        <path id="presWireHot2" d="M 245 95 L 345 95" fill="none" stroke="#FCA5A5" stroke-width="5" stroke-linecap="round" />
+                                        <path id="presWireNeutral" d="M 365 115 L 365 162 L 105 162" fill="none" stroke="#93C5FD" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" />
+                                        <g transform="translate(55, 132)">
+                                            <rect width="58" height="44" rx="10" fill="#1E293B" />
+                                            <text x="29" y="20" text-anchor="middle" fill="#FDE047" font-size="13" font-weight="900">230 V</text>
+                                            <text x="29" y="35" text-anchor="middle" fill="#CBD5E1" font-size="9" font-weight="700">ZDROJ</text>
+                                        </g>
+                                        <g onclick="presToggleCircuit()" class="cursor-pointer">
+                                            <rect x="172" y="66" width="86" height="58" rx="14" fill="#FFFFFF" stroke="#6366F1" stroke-width="2.5" />
+                                            <circle cx="192" cy="95" r="5" fill="#4F46E5" />
+                                            <circle cx="238" cy="95" r="5" fill="#4F46E5" />
+                                            <line id="presSwitchLever" x1="192" y1="95" x2="234" y2="76" stroke="#4F46E5" stroke-width="4.5" stroke-linecap="round" style="transition: all 0.25s ease;" />
+                                            <text x="215" y="116" text-anchor="middle" fill="#4338CA" font-size="10" font-weight="800">VYPÍNAČ (klikni)</text>
+                                        </g>
+                                        <g transform="translate(365, 95)">
+                                            <circle id="presBulbGlow" cx="0" cy="0" r="38" fill="#FEF08A" opacity="0" style="transition: opacity 0.3s ease;" />
+                                            <circle id="presBulbCircle" cx="0" cy="0" r="22" fill="#FFFFFF" stroke="#475569" stroke-width="3.5" style="transition: fill 0.3s ease;" />
+                                            <line x1="-13" y1="-13" x2="13" y2="13" stroke="#475569" stroke-width="3" stroke-linecap="round" />
+                                            <line x1="13" y1="-13" x2="-13" y2="13" stroke="#475569" stroke-width="3" stroke-linecap="round" />
+                                            <text x="0" y="-30" text-anchor="middle" fill="#334155" font-size="11" font-weight="800">ŽÁROVKA</text>
+                                        </g>
+                                    </svg>
+                                </div>
+
+                                <p id="presCircuitStatus" class="text-xs sm:text-sm font-bold text-slate-600 text-center">
+                                    Obvod je rozpojený. Klikni na <strong>VYPÍNAČ</strong> a sleduj, jak schéma ukazuje propojení bez realistického vzhledu.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SLIDE 6: MODEL × SCHÉMA -->
+                    <div class="pres-slide flex-col gap-4 w-full" data-pres-title="6. Model × Schéma">
+                        <h2 class="text-3xl sm:text-4xl font-black text-slate-900">⚖️ Model × Schéma</h2>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="p-5 rounded-3xl bg-sky-50 border-2 border-sky-200 flex flex-col gap-2">
+                                <div class="flex items-center gap-2.5">
+                                    <span class="text-2xl">🧩</span>
+                                    <h3 class="text-2xl font-black text-sky-900">Model</h3>
+                                </div>
+                                <p class="font-extrabold text-sky-950 text-base sm:text-lg">Zjednodušené znázornění něčeho.</p>
+                                <ul class="space-y-1 text-slate-700 font-bold text-sm sm:text-base">
+                                    <li><span class="text-sky-500">✔</span> Vhodný pro daný účel</li>
+                                    <li><span class="text-sky-500">✔</span> Obsahuje důležité prvky</li>
+                                </ul>
+                            </div>
+
+                            <div class="p-5 rounded-3xl bg-purple-50 border-2 border-purple-200 flex flex-col gap-2">
+                                <div class="flex items-center gap-2.5">
+                                    <span class="text-2xl">🔀</span>
+                                    <h3 class="text-2xl font-black text-purple-900">Schéma</h3>
+                                </div>
+                                <p class="font-extrabold text-purple-950 text-base sm:text-lg">Grafické znázornění vztahů, struktury nebo postupu.</p>
+                                <ul class="space-y-1 text-slate-700 font-bold text-sm sm:text-base">
+                                    <li><span class="text-purple-500">✔</span> Používá symboly a šipky</li>
+                                    <li><span class="text-purple-500">✔</span> Ukazuje souvislosti</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="p-3.5 sm:p-4 rounded-2xl bg-amber-50 border-2 border-amber-200 text-amber-950 font-extrabold text-center text-base sm:text-lg">
+                            📌 Schéma můžeme chápat jako jeden ze způsobů, jak něco znázornit.
+                        </div>
+
+                        <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200">
+                            <div class="flex items-center justify-between mb-3">
+                                <span class="font-black text-slate-800 text-sm sm:text-base">🎮 Rychlá rozhodovačka: Patří to spíš k modelu, nebo ke schématu?</span>
+                                <button type="button" onclick="presResetMiniSort()" class="text-xs font-extrabold text-slate-500 hover:text-slate-800 underline">Resetovat</button>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                                <div class="pres-sort-item bg-white p-3.5 rounded-xl border border-slate-200 flex flex-col justify-between gap-2.5" data-answer="schema">
+                                    <p class="text-sm font-bold text-slate-700">1. „K propojení kroků a prvků používá hlavně šipky a grafické symboly.“</p>
+                                    <div class="flex gap-2">
+                                        <button type="button" onclick="presCheckSort(this, 'model')" class="flex-1 py-1.5 rounded-lg bg-sky-100 hover:bg-sky-200 text-sky-900 font-extrabold text-xs transition">Model</button>
+                                        <button type="button" onclick="presCheckSort(this, 'schema')" class="flex-1 py-1.5 rounded-lg bg-purple-100 hover:bg-purple-200 text-purple-900 font-extrabold text-xs transition">Schéma</button>
+                                    </div>
+                                    <div class="pres-sort-fb text-xs font-extrabold hidden"></div>
+                                </div>
+
+                                <div class="pres-sort-item bg-white p-3.5 rounded-xl border border-slate-200 flex flex-col justify-between gap-2.5" data-answer="model">
+                                    <p class="text-sm font-bold text-slate-700">2. „Plastová kostra člověka v učebně přírodopisu.“</p>
+                                    <div class="flex gap-2">
+                                        <button type="button" onclick="presCheckSort(this, 'model')" class="flex-1 py-1.5 rounded-lg bg-sky-100 hover:bg-sky-200 text-sky-900 font-extrabold text-xs transition">Model</button>
+                                        <button type="button" onclick="presCheckSort(this, 'schema')" class="flex-1 py-1.5 rounded-lg bg-purple-100 hover:bg-purple-200 text-purple-900 font-extrabold text-xs transition">Schéma</button>
+                                    </div>
+                                    <div class="pres-sort-fb text-xs font-extrabold hidden"></div>
+                                </div>
+
+                                <div class="pres-sort-item bg-white p-3.5 rounded-xl border border-slate-200 flex flex-col justify-between gap-2.5" data-answer="schema">
+                                    <p class="text-sm font-bold text-slate-700">3. „Nákres elektrického zapojení světel v bytě bez realistického vzhledu.“</p>
+                                    <div class="flex gap-2">
+                                        <button type="button" onclick="presCheckSort(this, 'model')" class="flex-1 py-1.5 rounded-lg bg-sky-100 hover:bg-sky-200 text-sky-900 font-extrabold text-xs transition">Model</button>
+                                        <button type="button" onclick="presCheckSort(this, 'schema')" class="flex-1 py-1.5 rounded-lg bg-purple-100 hover:bg-purple-200 text-purple-900 font-extrabold text-xs transition">Schéma</button>
+                                    </div>
+                                    <div class="pres-sort-fb text-xs font-extrabold hidden"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SLIDE 7: DOKÁŽEME ČÍST MODEL? -->
+                    <div class="pres-slide flex-col gap-4 w-full" data-pres-title="7. Dokážeme číst model?">
+                        <div class="flex flex-wrap items-center justify-between gap-3">
+                            <h2 class="text-3xl sm:text-4xl font-black text-slate-900">🔎 Dokážeme číst model?</h2>
+                            <div class="inline-flex bg-slate-100 p-1 rounded-2xl border border-slate-200">
+                                <button id="presTabMetroBtn" type="button" onclick="presSwitchTab7('metro')" class="px-4 py-2 rounded-xl text-sm font-extrabold bg-white text-indigo-700 shadow-sm transition">
+                                    🚇 Mapa metra
+                                </button>
+                                <button id="presTabWeatherBtn" type="button" onclick="presSwitchTab7('weather')" class="px-4 py-2 rounded-xl text-sm font-extrabold text-slate-600 hover:text-slate-900 transition">
+                                    🌤️ Předpověď počasí
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- TAB A: MAPA METRA -->
+                        <div id="presPanelMetro" class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch">
+                            <div class="lg:col-span-7 bg-slate-50 rounded-3xl border border-slate-200 p-4 flex flex-col gap-2">
+                                <div class="flex items-center justify-between text-xs sm:text-sm font-bold text-slate-600">
+                                    <span>Klikni na přestupní stanici (Můstek, Muzeum, Florenc)</span>
+                                    <button type="button" onclick="presResetMetro()" class="text-indigo-600 hover:underline font-extrabold">Všechny linky</button>
+                                </div>
+
+                                <div class="bg-white rounded-2xl border border-slate-200 p-2">
+                                    <svg viewBox="0 0 480 230" class="w-full h-auto block" aria-label="Zjednodušená mapa pražského metra">
+                                        <g id="presLineA" class="transition-opacity duration-300">
+                                            <line x1="35" y1="130" x2="445" y2="130" stroke="#16A34A" stroke-width="10" stroke-linecap="round" />
+                                            <circle cx="35" cy="130" r="11" fill="#16A34A" />
+                                            <text x="35" y="134" text-anchor="middle" fill="#FFFFFF" font-size="11" font-weight="900">A</text>
+                                            <circle cx="95" cy="130" r="5" fill="#FFFFFF" stroke="#16A34A" stroke-width="2.5" />
+                                            <text x="95" y="114" text-anchor="middle" fill="#334155" font-size="10" font-weight="700">Dejvická</text>
+                                            <circle cx="155" cy="130" r="5" fill="#FFFFFF" stroke="#16A34A" stroke-width="2.5" />
+                                            <text x="155" y="114" text-anchor="middle" fill="#334155" font-size="10" font-weight="700">Staroměstská</text>
+                                            <circle cx="360" cy="130" r="5" fill="#FFFFFF" stroke="#16A34A" stroke-width="2.5" />
+                                            <text x="360" y="114" text-anchor="middle" fill="#334155" font-size="10" font-weight="700">Nám. Míru</text>
+                                            <circle cx="445" cy="130" r="11" fill="#16A34A" />
+                                            <text x="445" y="134" text-anchor="middle" fill="#FFFFFF" font-size="11" font-weight="900">A</text>
+                                        </g>
+                                        <g id="presLineB" class="transition-opacity duration-300">
+                                            <polyline points="45,195 190,195 255,62 435,62" fill="none" stroke="#EAB308" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" />
+                                            <circle cx="45" cy="195" r="11" fill="#EAB308" />
+                                            <text x="45" y="199" text-anchor="middle" fill="#FFFFFF" font-size="11" font-weight="900">B</text>
+                                            <circle cx="115" cy="195" r="5" fill="#FFFFFF" stroke="#CA8A04" stroke-width="2.5" />
+                                            <text x="115" y="214" text-anchor="middle" fill="#334155" font-size="10" font-weight="700">Anděl</text>
+                                            <circle cx="365" cy="62" r="5" fill="#FFFFFF" stroke="#CA8A04" stroke-width="2.5" />
+                                            <text x="365" y="46" text-anchor="middle" fill="#334155" font-size="10" font-weight="700">Palmovka</text>
+                                            <circle cx="435" cy="62" r="11" fill="#EAB308" />
+                                            <text x="435" y="66" text-anchor="middle" fill="#FFFFFF" font-size="11" font-weight="900">B</text>
+                                        </g>
+                                        <g id="presLineC" class="transition-opacity duration-300">
+                                            <polyline points="55,48 235,48 310,195 435,195" fill="none" stroke="#DC2626" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" />
+                                            <circle cx="55" cy="48" r="11" fill="#DC2626" />
+                                            <text x="55" y="52" text-anchor="middle" fill="#FFFFFF" font-size="11" font-weight="900">C</text>
+                                            <circle cx="150" cy="48" r="5" fill="#FFFFFF" stroke="#DC2626" stroke-width="2.5" />
+                                            <text x="150" y="33" text-anchor="middle" fill="#334155" font-size="10" font-weight="700">Vltavská</text>
+                                            <circle cx="370" cy="195" r="5" fill="#FFFFFF" stroke="#DC2626" stroke-width="2.5" />
+                                            <text x="370" y="214" text-anchor="middle" fill="#334155" font-size="10" font-weight="700">I. P. Pavlova</text>
+                                            <circle cx="435" cy="195" r="11" fill="#DC2626" />
+                                            <text x="435" y="199" text-anchor="middle" fill="#FFFFFF" font-size="11" font-weight="900">C</text>
+                                        </g>
+                                        <g class="cursor-pointer" onclick="presHighlightTransfer('mustek')">
+                                            <circle cx="222" cy="130" r="12" fill="#FFFFFF" stroke="#0F172A" stroke-width="3.5" />
+                                            <circle cx="222" cy="130" r="5" fill="#16A34A" />
+                                            <text x="205" y="156" text-anchor="middle" fill="#0F172A" font-size="12" font-weight="900">Můstek</text>
+                                        </g>
+                                        <g class="cursor-pointer" onclick="presHighlightTransfer('muzeum')">
+                                            <circle cx="277" cy="130" r="12" fill="#FFFFFF" stroke="#0F172A" stroke-width="3.5" />
+                                            <circle cx="277" cy="130" r="5" fill="#DC2626" />
+                                            <text x="303" y="156" text-anchor="middle" fill="#0F172A" font-size="12" font-weight="900">Muzeum</text>
+                                        </g>
+                                        <g class="cursor-pointer" onclick="presHighlightTransfer('florenc')">
+                                            <circle cx="250" cy="62" r="12" fill="#FFFFFF" stroke="#0F172A" stroke-width="3.5" />
+                                            <circle cx="250" cy="62" r="5" fill="#EAB308" />
+                                            <text x="255" y="38" text-anchor="middle" fill="#0F172A" font-size="12" font-weight="900">Florenc</text>
+                                        </g>
+                                    </svg>
+                                </div>
+
+                                <div id="presMetroInfo" class="px-3.5 py-2 rounded-xl bg-sky-50 border border-sky-200 text-sky-900 text-xs sm:text-sm font-bold text-center">
+                                    ℹ️ Klikni na libovolnou přestupní stanici v mapě a zvýrazní se její linky.
+                                </div>
+                            </div>
+
+                            <div class="lg:col-span-5 flex flex-col justify-between gap-4">
+                                <div class="p-4 rounded-2xl bg-emerald-50 border border-emerald-200">
+                                    <h3 class="font-black text-emerald-900 text-lg mb-2">Co vyčteme z mapy metra?</h3>
+                                    <ul class="space-y-1.5 text-slate-700 font-bold text-sm sm:text-base">
+                                        <li>📍 Kde jsou jednotlivé stanice</li>
+                                        <li>🔄 Kde můžeme přestoupit na jinou linku</li>
+                                        <li>🧭 Jak se dostat z jednoho místa na druhé</li>
+                                    </ul>
+                                </div>
+
+                                <div class="p-4 rounded-2xl bg-white border-2 border-indigo-200 shadow-sm">
+                                    <div class="text-xs font-extrabold uppercase text-indigo-600 mb-1">Rychlá otázka</div>
+                                    <p class="font-extrabold text-slate-800 text-sm sm:text-base mb-3">
+                                        Na které stanici přestoupíš mezi červenou linkou C a zelenou linkou A?
+                                    </p>
+                                    <div class="grid grid-cols-3 gap-2">
+                                        <button type="button" onclick="presCheckQuickQ('presMetroQ', false, this)" class="py-2 px-2 rounded-xl bg-slate-100 hover:bg-slate-200 font-extrabold text-sm text-slate-800 transition">Můstek</button>
+                                        <button type="button" onclick="presCheckQuickQ('presMetroQ', true, this)" class="py-2 px-2 rounded-xl bg-slate-100 hover:bg-slate-200 font-extrabold text-sm text-slate-800 transition">Muzeum</button>
+                                        <button type="button" onclick="presCheckQuickQ('presMetroQ', false, this)" class="py-2 px-2 rounded-xl bg-slate-100 hover:bg-slate-200 font-extrabold text-sm text-slate-800 transition">Florenc</button>
+                                    </div>
+                                    <div id="presMetroQFeedback" class="mt-2.5 text-xs sm:text-sm font-extrabold hidden"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- TAB B: PŘEDPOVĚĎ POČASÍ -->
+                        <div id="presPanelWeather" class="hidden grid-cols-1 lg:grid-cols-12 gap-5 items-stretch">
+                            <div class="lg:col-span-7 bg-slate-50 rounded-3xl border border-slate-200 p-4 flex flex-col gap-2.5">
+                                <div class="text-xs sm:text-sm font-bold text-slate-500">Klikni na libovolný den pro zvýraznění údajů:</div>
+
+                                <div class="overflow-x-auto bg-white rounded-2xl border border-slate-200">
+                                    <table class="w-full text-left border-collapse text-xs sm:text-sm">
+                                        <thead>
+                                            <tr class="bg-slate-100 text-slate-600 font-extrabold">
+                                                <th class="py-2.5 px-3">Den</th>
+                                                <th class="py-2.5 px-2">Srážky</th>
+                                                <th class="py-2.5 px-2">Stav</th>
+                                                <th class="py-2.5 px-2">Teplota</th>
+                                                <th class="py-2.5 px-3">Vítr</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="divide-y divide-slate-100 font-bold text-slate-700">
+                                            <tr onclick="presSelectWeatherRow(this, 'po 28: 11° – 23°, srážky 6 %, vítr 14 km/h JJV')" class="pres-weather-row cursor-pointer hover:bg-amber-50 transition">
+                                                <td class="py-2.5 px-3 font-black text-slate-900">po 28</td>
+                                                <td class="py-2.5 px-2 text-sky-600">💧 6 %</td>
+                                                <td class="py-2.5 px-2">🌤️ Většinou slunečno</td>
+                                                <td class="py-2.5 px-2 whitespace-nowrap"><span class="text-sky-600">11°</span> – <span class="text-amber-600">23°</span></td>
+                                                <td class="py-2.5 px-3 whitespace-nowrap">💨 14 km/h JJV</td>
+                                            </tr>
+                                            <tr onclick="presSelectWeatherRow(this, 'út 29: 12° – 24°, srážky 5 %, vítr 11 km/h JV')" class="pres-weather-row cursor-pointer hover:bg-amber-50 transition">
+                                                <td class="py-2.5 px-3 font-black text-slate-900">út 29</td>
+                                                <td class="py-2.5 px-2 text-sky-600">💧 5 %</td>
+                                                <td class="py-2.5 px-2">🌤️ Většinou slunečno</td>
+                                                <td class="py-2.5 px-2 whitespace-nowrap"><span class="text-sky-600">12°</span> – <span class="text-amber-600">24°</span></td>
+                                                <td class="py-2.5 px-3 whitespace-nowrap">💨 11 km/h JV</td>
+                                            </tr>
+                                            <tr onclick="presSelectWeatherRow(this, 'st 30: 12° – 24°, srážky 5 %, vítr 11 km/h JJV')" class="pres-weather-row cursor-pointer hover:bg-amber-50 transition">
+                                                <td class="py-2.5 px-3 font-black text-slate-900">st 30</td>
+                                                <td class="py-2.5 px-2 text-sky-600">💧 5 %</td>
+                                                <td class="py-2.5 px-2">⛅ Částečně zataženo</td>
+                                                <td class="py-2.5 px-2 whitespace-nowrap"><span class="text-sky-600">12°</span> – <span class="text-amber-600">24°</span></td>
+                                                <td class="py-2.5 px-3 whitespace-nowrap">💨 11 km/h JJV</td>
+                                            </tr>
+                                            <tr onclick="presSelectWeatherRow(this, 'čt 01: 12° – 22°, srážky 15 % (nejvyšší!), vítr 11 km/h JJV')" class="pres-weather-row cursor-pointer hover:bg-amber-50 transition">
+                                                <td class="py-2.5 px-3 font-black text-slate-900">čt 01</td>
+                                                <td class="py-2.5 px-2 text-sky-700 font-black">💧 15 %</td>
+                                                <td class="py-2.5 px-2">🌤️ Většinou slunečno</td>
+                                                <td class="py-2.5 px-2 whitespace-nowrap"><span class="text-sky-600">12°</span> – <span class="text-amber-600">22°</span></td>
+                                                <td class="py-2.5 px-3 whitespace-nowrap">💨 11 km/h JJV</td>
+                                            </tr>
+                                            <tr onclick="presSelectWeatherRow(this, 'pá 02: 11° – 21°, srážky 12 %, vítr 12 km/h VJV')" class="pres-weather-row cursor-pointer hover:bg-amber-50 transition">
+                                                <td class="py-2.5 px-3 font-black text-slate-900">pá 02</td>
+                                                <td class="py-2.5 px-2 text-sky-600">💧 12 %</td>
+                                                <td class="py-2.5 px-2">⛅ Částečně zataženo</td>
+                                                <td class="py-2.5 px-2 whitespace-nowrap"><span class="text-sky-600">11°</span> – <span class="text-amber-600">21°</span></td>
+                                                <td class="py-2.5 px-3 whitespace-nowrap">💨 12 km/h VJV</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                                <div id="presWeatherInfo" class="px-3.5 py-2 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 text-xs sm:text-sm font-bold text-center">
+                                    ☀️ Kliknutím na řádek v tabulce si můžeš zvýraznit vybraný den.
+                                </div>
+                            </div>
+
+                            <div class="lg:col-span-5 flex flex-col justify-between gap-4">
+                                <div class="p-4 rounded-2xl bg-amber-50 border border-amber-200">
+                                    <h3 class="font-black text-amber-900 text-lg mb-2">Co vyčteme z předpovědi počasí?</h3>
+                                    <ul class="space-y-1.5 text-slate-700 font-bold text-sm sm:text-base">
+                                        <li>🌡️ Teplota vzduchu</li>
+                                        <li>🌧️ Pravděpodobnost srážek</li>
+                                        <li>💨 Rychlost a směr větru</li>
+                                    </ul>
+                                </div>
+
+                                <div class="p-4 rounded-2xl bg-white border-2 border-amber-200 shadow-sm">
+                                    <div class="text-xs font-extrabold uppercase text-amber-600 mb-1">Rychlá otázka</div>
+                                    <p class="font-extrabold text-slate-800 text-sm sm:text-base mb-3">
+                                        Který den je nejvyšší pravděpodobnost srážek?
+                                    </p>
+                                    <div class="grid grid-cols-3 gap-2">
+                                        <button type="button" onclick="presCheckQuickQ('presWeatherQ', false, this)" class="py-2 px-2 rounded-xl bg-slate-100 hover:bg-slate-200 font-extrabold text-sm text-slate-800 transition">po 28</button>
+                                        <button type="button" onclick="presCheckQuickQ('presWeatherQ', true, this)" class="py-2 px-2 rounded-xl bg-slate-100 hover:bg-slate-200 font-extrabold text-sm text-slate-800 transition">čt 01</button>
+                                        <button type="button" onclick="presCheckQuickQ('presWeatherQ', false, this)" class="py-2 px-2 rounded-xl bg-slate-100 hover:bg-slate-200 font-extrabold text-sm text-slate-800 transition">pá 02</button>
+                                    </div>
+                                    <div id="presWeatherQFeedback" class="mt-2.5 text-xs sm:text-sm font-extrabold hidden"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SLIDE 8: SHRNUTÍ + ÚKOL -->
+                    <div class="pres-slide flex-col gap-5 w-full" data-pres-title="8. Shrnutí + Úkol">
+                        <h2 class="text-3xl sm:text-4xl font-black text-slate-900">🏁 Shrnutí + Úkol</h2>
+
+                        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+                            <div class="lg:col-span-6 flex flex-col gap-4">
+                                <div class="p-5 rounded-3xl bg-sky-50 border-2 border-sky-200">
+                                    <h3 class="text-xl font-black text-sky-900 mb-1">🧩 Model</h3>
+                                    <p class="font-extrabold text-slate-800 mb-2">Zjednodušené znázornění něčeho.</p>
+                                    <ul class="text-sm sm:text-base font-bold text-slate-600 space-y-1">
+                                        <li>• Vhodný pro daný účel</li>
+                                        <li>• Obsahuje důležité prvky</li>
+                                    </ul>
+                                </div>
+
+                                <div class="p-5 rounded-3xl bg-purple-50 border-2 border-purple-200">
+                                    <h3 class="text-xl font-black text-purple-900 mb-1">🔀 Schéma</h3>
+                                    <p class="font-extrabold text-slate-800 mb-2">Grafické znázornění vztahů, struktury nebo postupu.</p>
+                                    <ul class="text-sm sm:text-base font-bold text-slate-600 space-y-1">
+                                        <li>• Používá symboly a šipky</li>
+                                        <li>• Ukazuje souvislosti</li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <div class="lg:col-span-6 bg-emerald-50/70 rounded-3xl border-2 border-emerald-200 p-5 flex flex-col justify-between gap-4">
+                                <div>
+                                    <span class="inline-block px-3 py-1 rounded-full bg-emerald-200 text-emerald-900 text-xs font-extrabold uppercase tracking-wider mb-2">Praktická část</span>
+                                    <h3 class="text-2xl font-black text-slate-900">Teď si to vyzkoušíme! 🚀</h3>
+                                    <p class="text-sm font-bold text-slate-600 mt-1">Odškrtni si pracovní listy, až je budeš mít hotové:</p>
+
+                                    <div class="mt-4 space-y-3">
+                                        <label class="flex items-center gap-3.5 p-4 rounded-2xl bg-white border-2 border-slate-200 hover:border-emerald-400 cursor-pointer transition shadow-sm">
+                                            <input type="checkbox" onchange="presToggleWorksheet(this)" class="w-6 h-6 rounded-lg accent-emerald-500 cursor-pointer shrink-0" />
+                                            <div>
+                                                <div class="font-black text-slate-800 text-base sm:text-lg pres-ws-title">🚇 Pracovní list: Práce s mapou metra</div>
+                                                <div class="text-xs sm:text-sm font-semibold text-slate-500">Hledání stanic, přestupů a plánování trasy</div>
+                                            </div>
+                                        </label>
+
+                                        <label class="flex items-center gap-3.5 p-4 rounded-2xl bg-white border-2 border-slate-200 hover:border-emerald-400 cursor-pointer transition shadow-sm">
+                                            <input type="checkbox" onchange="presToggleWorksheet(this)" class="w-6 h-6 rounded-lg accent-emerald-500 cursor-pointer shrink-0" />
+                                            <div>
+                                                <div class="font-black text-slate-800 text-base sm:text-lg pres-ws-title">🌤️ Pracovní list: Práce s předpovědí počasí</div>
+                                                <div class="text-xs sm:text-sm font-semibold text-slate-500">Čtení teplot, srážek a směru větru</div>
+                                            </div>
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <button type="button" onclick="presOpenQuiz()" class="w-full py-3.5 px-5 rounded-2xl bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white font-black text-base sm:text-lg shadow-lg shadow-purple-200 transition transform hover:-translate-y-0.5">
+                                    🏆 Spustit rychlý kvíz (3 otázky)
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Dolní navigační lišta prezentace -->
+                <div class="px-4 sm:px-6 py-3.5 bg-slate-50 border-t border-slate-200/80 flex items-center justify-between gap-2 shrink-0">
+                    <button id="presPrevBtn" type="button" onclick="presChange(-1)" class="px-4 sm:px-5 py-2.5 rounded-xl font-extrabold text-sm sm:text-base bg-white border border-slate-200 text-slate-700 hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed transition shadow-sm">
+                        ‹ Předchozí
+                    </button>
+
+                    <div class="flex items-center gap-3">
+                        <div id="presDots" class="hidden sm:flex items-center gap-1.5"></div>
+                        <span id="presCounter" class="text-xs sm:text-sm font-black text-slate-600 bg-white px-3.5 py-1.5 rounded-full border border-slate-200">1 / 8</span>
+                    </div>
+
+                    <button id="presNextBtn" type="button" onclick="presChange(1)" class="px-4 sm:px-5 py-2.5 rounded-xl font-extrabold text-sm sm:text-base bg-indigo-500 hover:bg-indigo-600 text-white disabled:opacity-40 disabled:cursor-not-allowed transition shadow-sm">
+                        Další ›
+                    </button>
+                </div>
+
+                <!-- Modální okno: Rychlý kvíz uvnitř prezentace -->
+                <div id="presQuizModal" class="hidden fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-[110] flex items-center justify-center p-4">
+                    <div class="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl border border-slate-200 relative">
+                        <button type="button" onclick="presCloseQuiz()" class="absolute top-4 right-4 w-9 h-9 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 font-black flex items-center justify-center transition" aria-label="Zavřít kvíz">✕</button>
+
+                        <div id="presQuizContent">
+                            <div class="text-xs font-extrabold uppercase tracking-wider text-purple-600 mb-1" id="presQuizStep">Otázka 1 z 3</div>
+                            <h3 id="presQuizQuestion" class="text-xl font-black text-slate-900 mb-4 pr-8"></h3>
+                            <div id="presQuizOptions" class="flex flex-col gap-2.5"></div>
+                            <div id="presQuizFeedback" class="mt-4 p-3 rounded-xl text-sm font-bold hidden"></div>
+                            <div class="mt-5 flex justify-end">
+                                <button id="presQuizNextBtn" type="button" onclick="presNextQuizQ()" class="hidden px-5 py-2.5 rounded-xl bg-indigo-500 hover:bg-indigo-600 text-white font-extrabold text-sm transition">
+                                    Další otázka →
+                                </button>
+                            </div>
+                        </div>
+
+                        <div id="presQuizResult" class="hidden text-center py-4">
+                            <div id="presQuizEmoji" class="text-5xl mb-3">🎉</div>
+                            <h3 class="text-2xl font-black text-slate-900">Skvělá práce!</h3>
+                            <p id="presQuizScore" class="text-lg font-extrabold text-purple-700 mt-2"></p>
+                            <p id="presQuizMsg" class="text-sm font-semibold text-slate-600 mt-1 mb-6"></p>
+                            <div class="flex justify-center gap-3">
+                                <button type="button" onclick="presRestartQuiz()" class="px-5 py-2.5 rounded-xl bg-purple-100 hover:bg-purple-200 text-purple-800 font-extrabold text-sm transition">Zkusit znovu</button>
+                                <button type="button" onclick="presCloseQuiz()" class="px-5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-900 text-white font-extrabold text-sm transition">Zavřít</button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </section>
         </div>
@@ -661,17 +1581,16 @@
                         </div>
                     </div>
                     <div class="cw-right">
-                    <div class="cw-dock"><div id="cwKeys" class="cw-keys"></div></div>
-                    <div class="cw-clues grid md:grid-cols-2 lg:grid-cols-1 gap-4">
-                        <div><h4 class="font-bold text-slate-800 mb-2">Vodorovně →</h4><div id="cwAcross" class="flex flex-col gap-1"></div></div>
-                        <div><h4 class="font-bold text-slate-800 mb-2">Svisle ↓</h4><div id="cwDown" class="flex flex-col gap-1"></div></div>
-                    </div>
+                        <div class="cw-dock"><div id="cwKeys" class="cw-keys"></div></div>
+                        <div class="cw-clues grid md:grid-cols-2 lg:grid-cols-1 gap-4">
+                            <div><h4 class="font-bold text-slate-800 mb-2">Vodorovně →</h4><div id="cwAcross" class="flex flex-col gap-1"></div></div>
+                            <div><h4 class="font-bold text-slate-800 mb-2">Svisle ↓</h4><div id="cwDown" class="flex flex-col gap-1"></div></div>
+                        </div>
                     </div>
                 </div>
             </section>
         </div>
 
-        
     </main>
 
     <!-- Tabulka známkování (vyjede zespodu) -->
@@ -798,12 +1717,10 @@
         const gradeBtn = document.getElementById('gradeBtn');
 
         function updateGrade(points) {
-            // dokud nemá žádný bod, ukazujeme jen pomlčku
             const grade = points === 0 ? null : gradeFor(points);
-            const star = grade === 1 && isChecked(bonusBtn); // splněný bonus = 1*
+            const star = grade === 1 && isChecked(bonusBtn);
             const key = grade === null ? 'none' : grade + (star ? '*' : '');
 
-            // zvýraznění řádku v tabulce
             gradePanel.querySelectorAll('.grade-row').forEach(function (row) {
                 const g = row.dataset.grade;
                 const active = (g === 'bonus') ? star : (grade !== null && String(grade) === g);
@@ -823,7 +1740,6 @@
             }
         }
 
-        // Tabulka známkování: otevření / zavření
         function setGradePanel(open) {
             gradePanel.classList.toggle('open', open);
             gradePanel.setAttribute('aria-hidden', open ? 'false' : 'true');
@@ -833,7 +1749,6 @@
             setGradePanel(!gradePanel.classList.contains('open'));
         });
         document.getElementById('gradeClose').addEventListener('click', function () { setGradePanel(false); });
-        // kliknutí mimo tabulku ji zavře (capture, aby to fungovalo i na prvky se stopPropagation)
         document.addEventListener('click', function (e) {
             if (gradePanel.classList.contains('open') && !gradePanel.contains(e.target) && !gradeBtn.contains(e.target)) {
                 setGradePanel(false);
@@ -895,7 +1810,6 @@
             if (!animating) { animating = true; requestAnimationFrame(stepConfetti); }
         }
 
-        // Color splash: barevné "fleky" a kapky, které se rozstříknou
         function splash(x, y) {
             if (reduceMotion) return;
             const colors = ['#ef4444', '#f59e0b', '#facc15', '#22c55e', '#06b6d4', '#3b82f6', '#a855f7', '#ec4899'];
@@ -992,7 +1906,6 @@
             });
         }
 
-        // Hláška pro každý krok jiná
         const stepMessages = {
             mistnost: 'Základ stojí! Místnost je hotová 🏠',
             okno: 'Světlo dovnitř! Okna jsou na světě 🪟',
@@ -1011,7 +1924,6 @@
         const requiredChecks = allChecks.filter(function (b) { return b !== bonusBtn; });
         const isChecked = function (b) { return b.getAttribute('aria-checked') === 'true'; };
 
-        // Odevzdání je zamčené, dokud nejsou odškrtnuté všechny předchozí kroky
         function updateLock() {
             const unlocked = otherChecks.every(isChecked);
             [odevBtn, bonusBtn].forEach(function (b) {
@@ -1026,7 +1938,6 @@
             btn.setAttribute('aria-checked', done ? 'true' : 'false');
             btn.closest('.zadani-item').classList.toggle('done', done);
 
-            // fajvka u odpovídající záložky v menu
             const tabBtn = document.querySelector('.tab-btn[data-target="' + btn.dataset.tab + '"]');
             if (tabBtn) {
                 const old = tabBtn.querySelector('.tab-check');
@@ -1045,7 +1956,7 @@
 
         allChecks.forEach(function (btn) {
             btn.addEventListener('click', function (e) {
-                e.stopPropagation(); // nepřeskakovat na návod
+                e.stopPropagation();
 
                 const wasUnlocked = otherChecks.every(isChecked);
                 if ((btn === odevBtn || btn === bonusBtn) && !wasUnlocked) {
@@ -1056,7 +1967,6 @@
                 const done = !isChecked(btn);
                 setChecked(btn, done);
 
-                // Když někdo odškrtne dřívější krok, odevzdání se zase vrátí do nesplněného stavu
                 if (!done && btn !== odevBtn && btn !== bonusBtn) {
                     if (isChecked(odevBtn)) setChecked(odevBtn, false);
                     if (isChecked(bonusBtn)) setChecked(bonusBtn, false);
@@ -1091,7 +2001,7 @@
             });
         });
 
-        // ===== Přepínání obsahu: Prezentace / Zadání / Křížovka =====
+        // ===== Přepínání obsahu: Prezentace / Zadání / Video / Shrnutí / Křížovka =====
         let currentView = 'zadani';
         function showView(v, keepHash) {
             currentView = v;
@@ -1107,9 +2017,8 @@
             document.querySelector('main').classList.toggle('cw-main', v === 'krizovka');
             if (v !== 'krizovka') document.getElementById('cwInput').blur();
             if (v !== 'zadani') hiddenCls.forEach(function (c) { backBtn.classList.add(c); });
-            if (v === 'prezentace') initSlides();
+            if (v === 'prezentace') presInit();
             if (v === 'shrnuti') initH5P();
-            // video se načte až po otevření záložky a po odchodu se zastaví
             const vf = document.getElementById('videoFrame');
             if (v === 'video') { if (!vf.getAttribute('src')) vf.src = 'https://www.youtube-nocookie.com/embed/3cJHdgJFE1Y?rel=0'; }
             else vf.removeAttribute('src');
@@ -1125,122 +2034,458 @@
         function initH5P() {
             const f = document.querySelector('#h5pEmbed iframe');
             document.getElementById('h5pPlaceholder').classList.toggle('hidden', !!f);
-            // při prvním zobrazení iframe načteme znovu, aby se H5P správně přizpůsobilo šířce okna
             if (f && !h5pStarted) { h5pStarted = true; f.src = f.src; }
         }
 
-        // ===== Prezentace =====
-        // PDF: dej soubor vedle index.html. Gamma: { type: 'gamma', src: 'https://gamma.app/embed/…' }
-        const PRESENTATION = { type: 'pdf', src: 'prezentace.pdf', alt: ['Prezentace.pdf'] }; // alt = další názvy, které se zkusí
-        const PDFJS = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/';
-        const slideStage = document.getElementById('slideStage');
-        const slideCanvas = document.getElementById('slideCanvas');
-        const slideMsg = document.getElementById('slideMsg');
-        const slideCount = document.getElementById('slideCount');
-        let slidesStarted = false, pdfDoc = null, pageNum = 1, rendering = false, pendingPage = null;
+        // ===== NATIVNÍ INTERAKTIVNÍ PREZENTACE (zapouzdřená prefixem pres) =====
+        let presStarted = false;
+        let presCurrent = 0;
+        const presSlides = Array.from(document.querySelectorAll('.pres-slide'));
+        const presTotal = presSlides.length;
 
-        function slideError(why) {
-            slideMsg.classList.remove('hidden');
-            slideMsg.innerHTML = why + '<br><span class="text-sm">Hledaný soubor: <strong>' + PRESENTATION.src + '</strong></span>';
+        function presInit() {
+            if (presStarted) return;
+            presStarted = true;
+
+            const dotsBox = document.getElementById('presDots');
+            const menuList = document.getElementById('presMenuList');
+            dotsBox.innerHTML = '';
+            menuList.innerHTML = '';
+
+            presSlides.forEach(function (slide, idx) {
+                const title = slide.dataset.presTitle || ('Slide ' + (idx + 1));
+
+                const dot = document.createElement('button');
+                dot.type = 'button';
+                dot.title = title;
+                dot.setAttribute('aria-label', title);
+                dot.className = 'pres-dot w-2.5 h-2.5 rounded-full bg-slate-300 hover:bg-indigo-400 transition-all duration-200';
+                dot.addEventListener('click', function () { presGoTo(idx); });
+                dotsBox.appendChild(dot);
+
+                const item = document.createElement('button');
+                item.type = 'button';
+                item.textContent = title;
+                item.className = 'pres-menu-item text-left px-3 py-2 rounded-xl text-sm font-bold text-slate-700 hover:bg-indigo-50 hover:text-indigo-700 transition';
+                item.addEventListener('click', function () {
+                    presGoTo(idx);
+                    document.getElementById('presMenuDropdown').classList.add('hidden');
+                });
+                menuList.appendChild(item);
+            });
+
+            // Rozbalovací menu
+            const menuBtn = document.getElementById('presMenuBtn');
+            const dropdown = document.getElementById('presMenuDropdown');
+            menuBtn.addEventListener('click', function (e) {
+                e.stopPropagation();
+                dropdown.classList.toggle('hidden');
+            });
+            document.addEventListener('click', function () {
+                dropdown.classList.add('hidden');
+            });
+
+            // Fullscreen
+            const presApp = document.getElementById('presApp');
+            const fullBtn = document.getElementById('presFullBtn');
+            if (!(presApp.requestFullscreen || presApp.webkitRequestFullscreen)) {
+                fullBtn.classList.add('hidden');
+            }
+            fullBtn.addEventListener('click', function () {
+                try {
+                    if (!document.fullscreenElement) {
+                        (presApp.requestFullscreen || presApp.webkitRequestFullscreen).call(presApp);
+                    } else {
+                        document.exitFullscreen();
+                    }
+                } catch (err) {
+                    console.warn('Fullscreen nedostupný:', err);
+                }
+            });
+            document.addEventListener('fullscreenchange', function () {
+                const isFs = document.fullscreenElement === presApp;
+                document.getElementById('presFullText').textContent = isFs ? 'Ukončit' : 'Celá obrazovka';
+            });
+
+            // Dotykový swipe na prezentaci
+            let presSwipeX = null;
+            const stage = document.getElementById('presSlidesContainer');
+            stage.addEventListener('touchstart', function (e) { presSwipeX = e.touches[0].clientX; }, { passive: true });
+            stage.addEventListener('touchend', function (e) {
+                if (presSwipeX === null) return;
+                const dx = e.changedTouches[0].clientX - presSwipeX;
+                presSwipeX = null;
+                if (Math.abs(dx) > 55) presChange(dx < 0 ? 1 : -1);
+            }, { passive: true });
+
+            presUpdateView();
         }
-        function pdfProblem(err) {
-            const n = err && err.name;
-            if (n === 'MissingPDFException') return slideError('Soubor nebyl nalezen (404). Zkontroluj, že se přesně takto jmenuje (velká a malá písmena, bez mezer a diakritiky) a že leží ve stejné složce jako index.html.');
-            if (n === 'InvalidPDFException') return diagnosePdf();
-            slideError('Prezentaci se nepodařilo zobrazit' + (err && err.message ? ' (' + err.message + ')' : '') + '.');
+
+        function presUpdateView() {
+            presSlides.forEach(function (s, idx) {
+                s.classList.toggle('pres-active', idx === presCurrent);
+            });
+            document.getElementById('presProgressBar').style.width = (((presCurrent + 1) / presTotal) * 100) + '%';
+            document.getElementById('presCounter').textContent = (presCurrent + 1) + ' / ' + presTotal;
+            document.getElementById('presPrevBtn').disabled = presCurrent === 0;
+            document.getElementById('presNextBtn').disabled = presCurrent === presTotal - 1;
+
+            document.querySelectorAll('.pres-dot').forEach(function (d, idx) {
+                d.className = idx === presCurrent
+                    ? 'pres-dot w-7 h-2.5 rounded-full bg-indigo-500 transition-all duration-200'
+                    : 'pres-dot w-2.5 h-2.5 rounded-full bg-slate-300 hover:bg-indigo-400 transition-all duration-200';
+            });
+            document.querySelectorAll('.pres-menu-item').forEach(function (item, idx) {
+                item.classList.toggle('bg-indigo-100', idx === presCurrent);
+                item.classList.toggle('text-indigo-800', idx === presCurrent);
+            });
         }
-        // zjistí, co ve skutečnosti leží na adrese PDF
-        function diagnosePdf() {
-            fetch(PRESENTATION.src).then(function (r) {
-                return r.arrayBuffer().then(function (buf) { return { r: r, buf: buf }; });
-            }).then(function (x) {
-                const head = new TextDecoder().decode(x.buf.slice(0, 40)).replace(/[<>&"]/g, '?');
-                const kb = Math.round(x.buf.byteLength / 1024);
-                if (!x.buf.byteLength) return slideError('Soubor je prázdný (0 B). Nahraj ho na GitHub znovu.');
-                if (head.indexOf('version https://git-lfs') === 0) return slideError('Na GitHubu je jen odkaz Git LFS, ne samotné PDF. Nahraj PDF přímo, bez LFS.');
-                if (head.indexOf('%PDF') !== 0) return slideError('Soubor (' + kb + ' kB) nezačíná jako PDF, ale takto: „' + head + '“. Pravděpodobně je to jiný formát přejmenovaný na .pdf. Ulož nebo exportuj prezentaci znovu jako PDF.');
-                nativePdf(); // hlavička je v pořádku, zkusíme zobrazení prohlížečem
-            }).catch(function () { slideError('Soubor se nepodařilo stáhnout.'); });
+
+        function presChange(delta) {
+            const target = presCurrent + delta;
+            if (target >= 0 && target < presTotal) {
+                presCurrent = target;
+                presUpdateView();
+            }
         }
-        // když se nenačte knihovna pdf.js (blokované CDN, offline), zkusíme PDF vložit přímo
-        function nativePdf() {
-            slideStage.innerHTML = '<iframe src="' + PRESENTATION.src + '" class="w-full" style="height:70vh;border:0"></iframe>';
-            ['slidePrev', 'slideNext', 'slideCount'].forEach(function (id) { document.getElementById(id).classList.add('hidden'); });
+
+        function presGoTo(index) {
+            if (index >= 0 && index < presTotal) {
+                presCurrent = index;
+                presUpdateView();
+            }
         }
-        function initSlides() {
-            if (slidesStarted) return;
-            slidesStarted = true;
-            document.getElementById('slideOpen').href = PRESENTATION.src;
-            if (PRESENTATION.type === 'gamma') {
-                slideStage.innerHTML = '<iframe src="' + PRESENTATION.src + '" class="w-full" style="aspect-ratio:16/9;border:0" allowfullscreen loading="lazy"></iframe>';
-                ['slidePrev', 'slideNext', 'slideCount'].forEach(function (id) { document.getElementById(id).classList.add('hidden'); });
+
+        // Klávesové šipky pro prezentaci – aktivní JEN v pohledu 'prezentace'
+        document.addEventListener('keydown', function (e) {
+            if (currentView !== 'prezentace') return;
+            const quizOpen = !document.getElementById('presQuizModal').classList.contains('hidden');
+            if (quizOpen) {
+                if (e.key === 'Escape') presCloseQuiz();
                 return;
             }
-            if (slideStage.requestFullscreen || slideStage.webkitRequestFullscreen) document.getElementById('slideFull').classList.remove('hidden');
-            const sc = document.createElement('script');
-            sc.src = PDFJS + 'pdf.min.js';
-            sc.onload = function () {
-                pdfjsLib.GlobalWorkerOptions.workerSrc = PDFJS + 'pdf.worker.min.js';
-                const names = [PRESENTATION.src].concat(PRESENTATION.alt || []);
-                (function tryLoad(i) {
-                    pdfjsLib.getDocument(names[i]).promise.then(function (d) {
-                        pdfDoc = d;
-                        PRESENTATION.src = names[i];
-                        document.getElementById('slideOpen').href = names[i];
-                        renderPage(1);
-                    }).catch(function (e) {
-                        if (e && e.name === 'MissingPDFException' && i + 1 < names.length) return tryLoad(i + 1);
-                        pdfProblem(e);
-                    });
-                })(0);
-            };
-            sc.onerror = nativePdf;
-            document.head.appendChild(sc);
-        }
-        function renderPage(n) {
-            if (rendering) { pendingPage = n; return; }
-            rendering = true;
-            pageNum = n;
-            pdfDoc.getPage(n).then(function (page) {
-                const w = slideStage.clientWidth || 800;
-                const dpr = window.devicePixelRatio || 1;
-                const vp = page.getViewport({ scale: (w / page.getViewport({ scale: 1 }).width) * dpr });
-                slideCanvas.width = vp.width;
-                slideCanvas.height = vp.height;
-                slideCanvas.style.width = w + 'px';
-                slideCanvas.style.height = (vp.height / dpr) + 'px';
-                return page.render({ canvasContext: slideCanvas.getContext('2d'), viewport: vp }).promise;
-            }).then(function () {
-                rendering = false;
-                slideMsg.classList.add('hidden');
-                slideCount.textContent = pageNum + ' / ' + pdfDoc.numPages;
-                if (pendingPage) { const q = pendingPage; pendingPage = null; renderPage(q); }
-            }).catch(function (e) { rendering = false; pdfProblem(e); });
-        }
-        function slideGo(d) {
-            if (!pdfDoc) return;
-            const n = Math.min(pdfDoc.numPages, Math.max(1, pageNum + d));
-            if (n !== pageNum) renderPage(n);
-        }
-        document.getElementById('slidePrev').addEventListener('click', function () { slideGo(-1); });
-        document.getElementById('slideNext').addEventListener('click', function () { slideGo(1); });
-        document.getElementById('slideFull').addEventListener('click', function () {
-            (slideStage.requestFullscreen || slideStage.webkitRequestFullscreen).call(slideStage);
+            if (e.key === 'ArrowRight') presChange(1);
+            if (e.key === 'ArrowLeft') presChange(-1);
         });
-        let swipeX = null;
-        slideStage.addEventListener('touchstart', function (e) { swipeX = e.touches[0].clientX; }, { passive: true });
-        slideStage.addEventListener('touchend', function (e) {
-            if (swipeX === null) return;
-            const dx = e.changedTouches[0].clientX - swipeX;
-            swipeX = null;
-            if (Math.abs(dx) > 50) slideGo(dx < 0 ? 1 : -1);
-        });
-        let slideResize = null;
-        window.addEventListener('resize', function () {
-            clearTimeout(slideResize);
-            slideResize = setTimeout(function () { if (pdfDoc && currentView === 'prezentace') renderPage(pageNum); }, 200);
-        });
-        document.addEventListener('fullscreenchange', function () { if (pdfDoc) setTimeout(function () { renderPage(pageNum); }, 100); });
+
+        // Interaktivní funkce jednotlivých slajdů
+        function presToggleTrait(btn) {
+            const detail = btn.querySelector('.pres-trait-detail');
+            const arrow = btn.querySelector('.pres-trait-arrow');
+            const isHidden = detail.classList.contains('hidden');
+            detail.classList.toggle('hidden');
+            arrow.textContent = isHidden ? '−' : '＋';
+            btn.classList.toggle('ring-2', isHidden);
+            btn.classList.toggle('ring-indigo-300', isHidden);
+        }
+
+        function presSetCityMode(mode) {
+            const realSvg = document.getElementById('presSvgCityReality');
+            const modelSvg = document.getElementById('presSvgCityModel');
+            const btnReal = document.getElementById('presBtnCityReal');
+            const btnModel = document.getElementById('presBtnCityModel');
+            const badge = document.getElementById('presCityBadge');
+            const desc = document.getElementById('presCityDesc');
+
+            if (mode === 'model') {
+                realSvg.setAttribute('opacity', '0');
+                modelSvg.setAttribute('opacity', '1');
+                btnModel.className = 'px-3 py-1.5 rounded-lg text-xs sm:text-sm font-extrabold bg-indigo-500 text-white transition';
+                btnReal.className = 'px-3 py-1.5 rounded-lg text-xs sm:text-sm font-extrabold text-slate-600 hover:bg-slate-100 transition';
+                badge.className = 'px-3 py-1 rounded-full text-xs sm:text-sm font-extrabold bg-indigo-100 text-indigo-800';
+                badge.textContent = '🗺️ Zjednodušený model (mapa)';
+                desc.innerHTML = 'V modelu zmizely nepodstatné detaily a zůstaly jen <strong>důležité trasy, uzly a názvy</strong>.';
+            } else {
+                realSvg.setAttribute('opacity', '1');
+                modelSvg.setAttribute('opacity', '0');
+                btnReal.className = 'px-3 py-1.5 rounded-lg text-xs sm:text-sm font-extrabold bg-indigo-500 text-white transition';
+                btnModel.className = 'px-3 py-1.5 rounded-lg text-xs sm:text-sm font-extrabold text-slate-600 hover:bg-slate-100 transition';
+                badge.className = 'px-3 py-1 rounded-full text-xs sm:text-sm font-extrabold bg-amber-100 text-amber-800';
+                badge.textContent = '🏙️ Složité město (realita)';
+                desc.innerHTML = 'V realitě vidíme stovky detailů: okna, auta, stromy i barvy budov. Přepni na <strong>Model (mapa)</strong>!';
+            }
+        }
+
+        function presToggleAllFlips() {
+            const cards = document.querySelectorAll('.pres-flip-card');
+            const allFlipped = Array.from(cards).every(function (c) { return c.classList.contains('pres-flipped'); });
+            cards.forEach(function (c) { c.classList.toggle('pres-flipped', !allFlipped); });
+            presUpdateRevealBtn();
+        }
+        function presUpdateRevealBtn() {
+            const cards = document.querySelectorAll('.pres-flip-card');
+            const allFlipped = Array.from(cards).every(function (c) { return c.classList.contains('pres-flipped'); });
+            document.getElementById('presRevealAllBtn').textContent = allFlipped ? '🔄 Otočit zpět' : '✨ Odhalit vše';
+        }
+
+        function presHighlightCard(card) {
+            document.querySelectorAll('.pres-example-card').forEach(function (c) {
+                c.classList.remove('ring-4', 'ring-indigo-300', 'scale-[1.02]', 'shadow-md');
+            });
+            card.classList.add('ring-4', 'ring-indigo-300', 'scale-[1.02]', 'shadow-md');
+        }
+
+        let presCircuitOn = false;
+        function presToggleCircuit() {
+            presCircuitOn = !presCircuitOn;
+            const lever = document.getElementById('presSwitchLever');
+            const w1 = document.getElementById('presWireHot1');
+            const w2 = document.getElementById('presWireHot2');
+            const wn = document.getElementById('presWireNeutral');
+            const glow = document.getElementById('presBulbGlow');
+            const bulb = document.getElementById('presBulbCircle');
+            const btn = document.getElementById('presSwitchBtn');
+            const status = document.getElementById('presCircuitStatus');
+
+            if (presCircuitOn) {
+                lever.setAttribute('y2', '95');
+                w2.setAttribute('stroke', '#EF4444');
+                wn.setAttribute('stroke', '#2563EB');
+                w1.classList.add('pres-wire-active');
+                w2.classList.add('pres-wire-active');
+                wn.classList.add('pres-wire-active');
+                glow.setAttribute('opacity', '0.9');
+                bulb.setAttribute('fill', '#FEF08A');
+                btn.textContent = '💡 Vypnout vypínač';
+                btn.className = 'px-4 py-1.5 rounded-xl font-extrabold text-xs sm:text-sm bg-amber-400 hover:bg-amber-500 text-amber-950 transition';
+                status.innerHTML = '✅ <strong>Obvod je uzavřený!</strong> Proudem se rozsvítila žárovka – na schématu okamžitě vidíme souvislost.';
+            } else {
+                lever.setAttribute('y2', '76');
+                w2.setAttribute('stroke', '#FCA5A5');
+                wn.setAttribute('stroke', '#93C5FD');
+                w1.classList.remove('pres-wire-active');
+                w2.classList.remove('pres-wire-active');
+                wn.classList.remove('pres-wire-active');
+                glow.setAttribute('opacity', '0');
+                bulb.setAttribute('fill', '#FFFFFF');
+                btn.textContent = '🔌 Zapnout vypínač';
+                btn.className = 'px-4 py-1.5 rounded-xl font-extrabold text-xs sm:text-sm bg-slate-200 hover:bg-slate-300 text-slate-800 transition';
+                status.innerHTML = 'Obvod je rozpojený. Klikni na <strong>VYPÍNAČ</strong> a sleduj, jak schéma ukazuje propojení bez realistického vzhledu.';
+            }
+        }
+
+        function presCheckSort(btn, choice) {
+            const container = btn.closest('.pres-sort-item');
+            const correct = container.dataset.answer;
+            const fb = container.querySelector('.pres-sort-fb');
+            fb.classList.remove('hidden');
+            if (choice === correct) {
+                container.classList.remove('border-rose-300', 'bg-rose-50/40');
+                container.classList.add('border-emerald-400', 'bg-emerald-50/40');
+                fb.className = 'pres-sort-fb text-xs font-extrabold text-emerald-700';
+                fb.textContent = '✅ Správně!';
+            } else {
+                container.classList.remove('border-emerald-400', 'bg-emerald-50/40');
+                container.classList.add('border-rose-300', 'bg-rose-50/40');
+                fb.className = 'pres-sort-fb text-xs font-extrabold text-rose-600';
+                fb.textContent = '❌ Zkus to ještě jednou!';
+            }
+        }
+        function presResetMiniSort() {
+            document.querySelectorAll('.pres-sort-item').forEach(function (item) {
+                item.classList.remove('border-emerald-400', 'bg-emerald-50/40', 'border-rose-300', 'bg-rose-50/40');
+                const fb = item.querySelector('.pres-sort-fb');
+                fb.classList.add('hidden');
+                fb.textContent = '';
+            });
+        }
+
+        function presSwitchTab7(tab) {
+            const pm = document.getElementById('presPanelMetro');
+            const pw = document.getElementById('presPanelWeather');
+            const bm = document.getElementById('presTabMetroBtn');
+            const bw = document.getElementById('presTabWeatherBtn');
+            if (tab === 'metro') {
+                pm.classList.remove('hidden'); pm.classList.add('grid');
+                pw.classList.add('hidden'); pw.classList.remove('grid');
+                bm.className = 'px-4 py-2 rounded-xl text-sm font-extrabold bg-white text-indigo-700 shadow-sm transition';
+                bw.className = 'px-4 py-2 rounded-xl text-sm font-extrabold text-slate-600 hover:text-slate-900 transition';
+            } else {
+                pw.classList.remove('hidden'); pw.classList.add('grid');
+                pm.classList.add('hidden'); pm.classList.remove('grid');
+                bw.className = 'px-4 py-2 rounded-xl text-sm font-extrabold bg-white text-amber-700 shadow-sm transition';
+                bm.className = 'px-4 py-2 rounded-xl text-sm font-extrabold text-slate-600 hover:text-slate-900 transition';
+            }
+        }
+
+        function presHighlightTransfer(station) {
+            const la = document.getElementById('presLineA');
+            const lb = document.getElementById('presLineB');
+            const lc = document.getElementById('presLineC');
+            const info = document.getElementById('presMetroInfo');
+            la.style.opacity = '0.22'; lb.style.opacity = '0.22'; lc.style.opacity = '0.22';
+            if (station === 'mustek') {
+                la.style.opacity = '1'; lb.style.opacity = '1';
+                info.innerHTML = '🟢🟡 <strong>Můstek:</strong> Přestupní stanice mezi zelenou linkou <strong>A</strong> a žlutou linkou <strong>B</strong>.';
+            } else if (station === 'muzeum') {
+                la.style.opacity = '1'; lc.style.opacity = '1';
+                info.innerHTML = '🟢🔴 <strong>Muzeum:</strong> Přestupní stanice mezi zelenou linkou <strong>A</strong> a červenou linkou <strong>C</strong>.';
+            } else if (station === 'florenc') {
+                lb.style.opacity = '1'; lc.style.opacity = '1';
+                info.innerHTML = '🟡🔴 <strong>Florenc:</strong> Přestupní stanice mezi žlutou linkou <strong>B</strong> a červenou linkou <strong>C</strong>.';
+            }
+        }
+        function presResetMetro() {
+            document.getElementById('presLineA').style.opacity = '1';
+            document.getElementById('presLineB').style.opacity = '1';
+            document.getElementById('presLineC').style.opacity = '1';
+            document.getElementById('presMetroInfo').innerHTML = 'ℹ️ Klikni na libovolnou přestupní stanici v mapě a zvýrazní se její linky.';
+        }
+
+        function presSelectWeatherRow(row, summary) {
+            document.querySelectorAll('.pres-weather-row').forEach(function (r) { r.classList.remove('bg-amber-100'); });
+            row.classList.add('bg-amber-100');
+            document.getElementById('presWeatherInfo').innerHTML = '📅 Vybraný den – <strong>' + summary + '</strong>';
+        }
+
+        function presCheckQuickQ(prefix, isCorrect, btn) {
+            const fb = document.getElementById(prefix + 'Feedback');
+            Array.from(btn.parentElement.children).forEach(function (b) {
+                b.classList.remove('bg-emerald-500', 'text-white', 'bg-rose-500');
+                b.classList.add('bg-slate-100', 'text-slate-800');
+            });
+            fb.classList.remove('hidden');
+            if (isCorrect) {
+                btn.classList.remove('bg-slate-100', 'text-slate-800');
+                btn.classList.add('bg-emerald-500', 'text-white');
+                fb.className = 'mt-2.5 text-xs sm:text-sm font-extrabold text-emerald-700';
+                fb.textContent = '🎉 Výborně! Přesně tak, umíš v modelu číst.';
+            } else {
+                btn.classList.remove('bg-slate-100', 'text-slate-800');
+                btn.classList.add('bg-rose-500', 'text-white');
+                fb.className = 'mt-2.5 text-xs sm:text-sm font-extrabold text-rose-600';
+                fb.textContent = '🤔 Těsně vedle! Podívej se znovu na model vlevo.';
+            }
+        }
+
+        function presToggleWorksheet(cb) {
+            const card = cb.closest('label');
+            const title = card.querySelector('.pres-ws-title');
+            if (cb.checked) {
+                card.classList.add('bg-emerald-100/70', 'border-emerald-400');
+                title.classList.add('line-through', 'text-emerald-800');
+            } else {
+                card.classList.remove('bg-emerald-100/70', 'border-emerald-400');
+                title.classList.remove('line-through', 'text-emerald-800');
+            }
+        }
+
+        // Kvíz na konci prezentace
+        const presQuizData = [
+            {
+                q: 'Co nejlépe vystihuje pojem MODEL?',
+                opts: [
+                    'Přesná kopie reality se všemi detaily do posledního milimetru.',
+                    'Zjednodušené znázornění něčeho skutečného, které obsahuje jen důležité informace.',
+                    'Pouze počítačová hra, která nesouvisí se skutečným světem.'
+                ],
+                ok: 1,
+                exp: 'Model záměrně vynechává zbytečné detaily, abychom realitu lépe pochopili.'
+            },
+            {
+                q: 'Čím se vyznačuje SCHÉMA?',
+                opts: [
+                    'Používá symboly a šipky, ukazuje souvislosti a neřeší realistický vzhled.',
+                    'Musí vypadat jako realistická fotografie bez jakýchkoliv značek.',
+                    'Je to vždy dlouhý souvislý text bez obrázků.'
+                ],
+                ok: 0,
+                exp: 'Ve schématu je důležitý obsah a vztahy mezi prvky, nikoliv realistická podoba.'
+            },
+            {
+                q: 'Které informace běžně vyčteme z modelu předpovědi počasí?',
+                opts: [
+                    'Přestupní stanice metra a jména příbuzných.',
+                    'Rozměry místností a umístění vypínačů.',
+                    'Teplotu vzduchu, pravděpodobnost srážek, rychlost a směr větru.'
+                ],
+                ok: 2,
+                exp: 'Předpověď počasí nám pomáhá naplánovat den pomocí údajů o teplotě, srážkách a větru.'
+            }
+        ];
+        let presQIdx = 0, presQScore = 0, presQAnswered = false;
+
+        function presOpenQuiz() {
+            document.getElementById('presQuizModal').classList.remove('hidden');
+            presRestartQuiz();
+        }
+        function presCloseQuiz() {
+            document.getElementById('presQuizModal').classList.add('hidden');
+        }
+        function presRestartQuiz() {
+            presQIdx = 0; presQScore = 0;
+            document.getElementById('presQuizContent').classList.remove('hidden');
+            document.getElementById('presQuizResult').classList.add('hidden');
+            presRenderQuiz();
+        }
+        function presRenderQuiz() {
+            presQAnswered = false;
+            const item = presQuizData[presQIdx];
+            document.getElementById('presQuizStep').textContent = 'Otázka ' + (presQIdx + 1) + ' z ' + presQuizData.length;
+            document.getElementById('presQuizQuestion').textContent = item.q;
+            const box = document.getElementById('presQuizOptions');
+            box.innerHTML = '';
+            item.opts.forEach(function (txt, i) {
+                const b = document.createElement('button');
+                b.type = 'button';
+                b.className = 'text-left p-3.5 rounded-2xl border-2 border-slate-200 hover:border-purple-400 hover:bg-purple-50 font-bold text-sm sm:text-base text-slate-800 transition';
+                b.textContent = txt;
+                b.addEventListener('click', function () { presSelectQuizOpt(i, b); });
+                box.appendChild(b);
+            });
+            document.getElementById('presQuizFeedback').classList.add('hidden');
+            document.getElementById('presQuizNextBtn').classList.add('hidden');
+        }
+        function presSelectQuizOpt(sel, btn) {
+            if (presQAnswered) return;
+            presQAnswered = true;
+            const item = presQuizData[presQIdx];
+            const btns = document.querySelectorAll('#presQuizOptions button');
+            const fb = document.getElementById('presQuizFeedback');
+            btns.forEach(function (b, i) {
+                b.disabled = true;
+                if (i === item.ok) {
+                    b.classList.remove('border-slate-200');
+                    b.classList.add('border-emerald-500', 'bg-emerald-50', 'text-emerald-900');
+                }
+            });
+            if (sel === item.ok) {
+                presQScore++;
+                fb.className = 'mt-4 p-3 rounded-xl text-sm font-bold bg-emerald-50 text-emerald-800 border border-emerald-200';
+                fb.textContent = '✅ Správně! ' + item.exp;
+            } else {
+                btn.classList.remove('border-slate-200');
+                btn.classList.add('border-rose-400', 'bg-rose-50', 'text-rose-900');
+                fb.className = 'mt-4 p-3 rounded-xl text-sm font-bold bg-rose-50 text-rose-800 border border-rose-200';
+                fb.textContent = '❌ Bohužel ne. ' + item.exp;
+            }
+            const nextBtn = document.getElementById('presQuizNextBtn');
+            nextBtn.textContent = presQIdx === presQuizData.length - 1 ? 'Zobrazit výsledek 🏆' : 'Další otázka →';
+            nextBtn.classList.remove('hidden');
+        }
+        function presNextQuizQ() {
+            presQIdx++;
+            if (presQIdx < presQuizData.length) {
+                presRenderQuiz();
+            } else {
+                document.getElementById('presQuizContent').classList.add('hidden');
+                document.getElementById('presQuizResult').classList.remove('hidden');
+                document.getElementById('presQuizScore').textContent = 'Tvé skóre: ' + presQScore + ' / ' + presQuizData.length;
+                const emoji = document.getElementById('presQuizEmoji');
+                const msg = document.getElementById('presQuizMsg');
+                if (presQScore === presQuizData.length) {
+                    emoji.textContent = '🏆';
+                    msg.textContent = 'Bez jediné chyby! Téma Modely a schémata ovládáš na jedničku.';
+                    bigCelebration();
+                } else if (presQScore >= 2) {
+                    emoji.textContent = '👏';
+                    msg.textContent = 'Moc pěkný výsledek! Ještě drobnost a máš to kompletní.';
+                } else {
+                    emoji.textContent = '💡';
+                    msg.textContent = 'Nevadí, zkus si prezentaci ještě jednou projít a dát si kvíz znovu.';
+                }
+            }
+        }
 
         // ===== Křížovka =====
         const CW = [[7,3,"A","DIGITÁLNÍ","Jaký je model v počítači, na rozdíl od fyzického?"],[3,6,"D","STANICE","Místo na trase metra, kde vlak zastavuje a cestující vystupují"],[5,3,"D","RODOKMEN","Model rodiny: přehled příbuzných"],[3,0,"A","PŮDORYS","Model domu při pohledu shora"],[3,11,"D","REALITA","Skutečný svět, ze kterého model vychází"],[11,1,"A","PŘEDPOVĚĎ","Model počasí, podle kterého plánujeme den"],[2,8,"D","KOSTRA","Model, který ukazuje kosti lidského těla"],[1,0,"D","TEPLOTA","Údaj z předpovědi počasí, měří se ve stupních"],[9,0,"A","ŠIPKY","Schéma jimi ukazuje směr a souvislosti"],[9,8,"A","VZTAHY","Souvislosti mezi věcmi, které schéma rychle ukáže"],[4,8,"A","SCHÉMA","Grafické znázornění vztahů, struktury nebo postupu"],[8,13,"D","SYMBOLY","Značky a obrázky, které ve schématu nahrazují slova"],[0,13,"D","LINKA","Trasa metra označená na mapě barvou, např. A, B nebo C"],[0,4,"D","METRO","Jeho mapa ukazuje stanice, linky a přestupy"],[0,4,"A","MAPA","Model města, podle kterého se orientujeme v ulicích"],[13,8,"A","DETAILY","Drobné podrobnosti, které model záměrně vynechává"],[0,9,"A","MODEL","Zjednodušené znázornění něčeho"]];
@@ -1280,7 +2525,6 @@
                 }
             }
 
-            // Na mobilu (úzké nebo nízké okno) se místo vlastní klávesnice použije systémová
             const nativeInput = document.getElementById('cwInput');
             const useNative = function () { return window.matchMedia('(max-width: 599px), (max-height: 559px)').matches; };
             function focusNative() {
@@ -1297,7 +2541,6 @@
                 nativeInput.value = ' ';
             });
 
-            // výška přilepené klávesnice (kvůli odsazení obsahu a hlášek)
             const dockEl = document.querySelector('.cw-dock');
             new ResizeObserver(function () {
                 const fixed = getComputedStyle(dockEl).position === 'fixed';
@@ -1360,7 +2603,6 @@
                 draw(cell); paint();
             }
 
-            // klávesnice na obrazovce
             const keys = document.getElementById('cwKeys');
             ['QWERTZUIOP', 'ASDFGHJKL', 'YXCVBNM⌫'].forEach(function (row) {
                 const d = document.createElement('div');
@@ -1381,7 +2623,6 @@
                 else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') { cur.i = Math.max(cur.i - 1, 0); paint(); }
             });
 
-            // nápovědy
             order.forEach(function (wi) {
                 const b = document.createElement('button');
                 b.type = 'button'; b.className = 'cw-clue-item'; b.dataset.w = wi;
@@ -1396,7 +2637,6 @@
             document.getElementById('cwPrev').addEventListener('click', function () { jump(-1); });
             document.getElementById('cwNext').addEventListener('click', function () { jump(1); });
 
-            // tlačítka
             document.getElementById('cwCheck').addEventListener('click', function () {
                 let bad = 0, empty = 0;
                 Object.keys(cells).forEach(function (k) {
@@ -1450,28 +2690,23 @@
 
         // Funkce pro přepínání záložek
         function openTab(tabName) {
-            // Skrýt všechny obsahy záložek
             const tabContents = document.querySelectorAll('.tab-content');
             tabContents.forEach(content => {
                 content.classList.remove('active');
             });
 
-            // Resetovat styly všech tlačítek
             const tabBtns = document.querySelectorAll('.tab-btn');
             tabBtns.forEach(btn => {
                 btn.className = "tab-btn w-full text-left px-5 py-4 rounded-xl font-bold transition-all whitespace-nowrap text-slate-600 hover:bg-slate-50 border-2 border-transparent";
             });
 
-            // Zobrazit požadovaný obsah
             const activeTab = document.getElementById(tabName);
             if (activeTab) {
                 activeTab.classList.add('active');
             }
 
-            // Zvýraznit aktivní tlačítko
             const activeBtn = document.querySelector(`button[data-target="${tabName}"]`);
             if (activeBtn) {
-                // Přidáme speciální třídy pro aktivní stav (např. fialové pozadí)
                 activeBtn.className = "tab-btn w-full text-left px-5 py-4 rounded-xl font-bold transition-all whitespace-nowrap bg-indigo-50 text-indigo-700 shadow-sm border-2 border-indigo-200";
             }
         }
