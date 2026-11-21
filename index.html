@@ -172,6 +172,8 @@
         .cw-clue-item { text-align: left; padding: .5rem .75rem; border-radius: .75rem; background: #f8fafc; touch-action: manipulation; }
         .cw-clue-item.on { background: #e0e7ff; }
 
+        #h5pEmbed iframe { display: block; width: 100%; max-width: 100%; border: 0; border-radius: 1rem; }
+
         .tab-content img {
             max-width: min(100%, 480px);
             max-height: 340px;
@@ -212,6 +214,7 @@
             <button type="button" data-view="prezentace" aria-pressed="false" class="view-btn ml-auto flex items-center gap-2 whitespace-nowrap rounded-2xl px-6 py-4 min-h-[56px] text-lg font-bold text-slate-600 bg-slate-50 hover:bg-indigo-50 transition">📊 Prezentace</button>
             <button type="button" data-view="zadani" aria-pressed="false" class="view-btn  flex items-center gap-2 whitespace-nowrap rounded-2xl px-6 py-4 min-h-[56px] text-lg font-bold text-slate-600 bg-slate-50 hover:bg-indigo-50 transition">📝 Zadání</button>
             <button type="button" data-view="video" aria-pressed="false" class="view-btn  flex items-center gap-2 whitespace-nowrap rounded-2xl px-6 py-4 min-h-[56px] text-lg font-bold text-slate-600 bg-slate-50 hover:bg-indigo-50 transition">🎬 Video</button>
+            <button type="button" data-view="shrnuti" aria-pressed="false" class="view-btn  flex items-center gap-2 whitespace-nowrap rounded-2xl px-6 py-4 min-h-[56px] text-lg font-bold text-slate-600 bg-slate-50 hover:bg-indigo-50 transition">🧠 Shrnutí</button>
             <button type="button" data-view="krizovka" aria-pressed="false" class="view-btn mr-auto flex items-center gap-2 whitespace-nowrap rounded-2xl px-6 py-4 min-h-[56px] text-lg font-bold text-slate-600 bg-slate-50 hover:bg-indigo-50 transition">🧩 Křížovka</button>
         </div>
     </nav>
@@ -623,6 +626,17 @@
                     <iframe id="videoFrame" title="Jak na myšlenkové mapy" class="absolute inset-0 w-full h-full" style="border:0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>
                 </div>
                 <p class="mt-4 text-center"><a href="https://www.youtube.com/watch?v=3cJHdgJFE1Y" target="_blank" rel="noopener noreferrer" class="inline-flex items-center min-h-[48px] px-5 rounded-2xl bg-slate-50 hover:bg-slate-100 text-slate-600 font-bold">Otevřít na YouTube ↗</a></p>
+            </section>
+        </div>
+
+        <!-- SHRNUTÍ (H5P) -->
+        <div id="view-shrnuti" class="hidden">
+            <section class="bg-white rounded-[2rem] shadow-xl border-t-8 border-teal-300 p-4 md:p-8 mb-16">
+                <h3 class="text-2xl md:text-3xl font-bold text-slate-800 mb-4">🧠 Shrnutí</h3>
+                <div id="h5pEmbed" class="w-full max-w-[1088px] mx-auto">
+                   <iframe src="https://asdfasd.h5p.com/content/1293067160874723527/embed" aria-label="Modely a schémata - shrnutí" width="1088" height="637" frameborder="0" allowfullscreen="allowfullscreen" allow="autoplay *; geolocation *; microphone *; camera *; midi *; encrypted-media *"></iframe><script src="https://asdfasd.h5p.com/js/h5p-resizer.js" charset="UTF-8"></script>
+                </div>
+                <p id="h5pPlaceholder" class="text-center text-slate-500 bg-slate-50 rounded-2xl p-8"></p>
             </section>
         </div>
 
@@ -1081,7 +1095,7 @@
         let currentView = 'zadani';
         function showView(v, keepHash) {
             currentView = v;
-            ['prezentace', 'video', 'zadani', 'krizovka'].forEach(function (n) {
+            ['prezentace', 'video', 'shrnuti', 'zadani', 'krizovka'].forEach(function (n) {
                 document.getElementById('view-' + n).classList.toggle('hidden', n !== v);
             });
             document.querySelectorAll('.view-btn').forEach(function (b) {
@@ -1094,6 +1108,7 @@
             if (v !== 'krizovka') document.getElementById('cwInput').blur();
             if (v !== 'zadani') hiddenCls.forEach(function (c) { backBtn.classList.add(c); });
             if (v === 'prezentace') initSlides();
+            if (v === 'shrnuti') initH5P();
             // video se načte až po otevření záložky a po odchodu se zastaví
             const vf = document.getElementById('videoFrame');
             if (v === 'video') { if (!vf.getAttribute('src')) vf.src = 'https://www.youtube-nocookie.com/embed/3cJHdgJFE1Y?rel=0'; }
@@ -1104,6 +1119,15 @@
         document.querySelectorAll('.view-btn').forEach(function (b) {
             b.addEventListener('click', function () { showView(b.dataset.view); });
         });
+
+        // ===== Shrnutí (H5P) =====
+        let h5pStarted = false;
+        function initH5P() {
+            const f = document.querySelector('#h5pEmbed iframe');
+            document.getElementById('h5pPlaceholder').classList.toggle('hidden', !!f);
+            // při prvním zobrazení iframe načteme znovu, aby se H5P správně přizpůsobilo šířce okna
+            if (f && !h5pStarted) { h5pStarted = true; f.src = f.src; }
+        }
 
         // ===== Prezentace =====
         // PDF: dej soubor vedle index.html. Gamma: { type: 'gamma', src: 'https://gamma.app/embed/…' }
@@ -1453,7 +1477,7 @@
         }
     
         const startHash = location.hash.slice(1);
-        if (startHash === 'prezentace' || startHash === 'video' || startHash === 'krizovka') showView(startHash, true);
+        if (['prezentace', 'video', 'shrnuti', 'krizovka'].indexOf(startHash) >= 0) showView(startHash, true);
         else showView('zadani', true);
     </script>
 </body>
